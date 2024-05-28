@@ -1,7 +1,7 @@
 SECTIONS
 {
     . = 0x80000;     /* Address of first instruction */
-    .text : { KEEP(*(.text.boot)) *(.text .text.* .gnu.linkonce.t*) } // Ensure `.text` section starts with the bootloader code
+    .text : { KEEP(*(.text.boot)) *(.text .text.* .gnu.linkonce.t*) } /* Ensure `.text` section starts with the bootloader code */
     
     .rodata : { *(.rodata .rodata.* .gnu.linkonce.r*) }
 
