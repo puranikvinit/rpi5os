@@ -25,3 +25,4 @@ SECTIONS
 /* .gnu.linkonce.d -> used by the GNU linker for certain optimizations
 *  for example, merge identical constants across various files into a single section to save space and access times */
 
+__bss_size = (__bss_end - __bss_start)>>3; /* Size of the BSS section */
