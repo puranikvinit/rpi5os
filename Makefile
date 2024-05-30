@@ -2,7 +2,7 @@ C_FILES = $(wildcard kernel/*.c)
 OBJ_FILES = $(C_FILES:.c=.o)
 
 LLVM_PATH = /opt/homebrew/opt/llvm/bin/
-CLANG_FLAGS = -Wall -O2 -ffreestanding -nostdinc -nostdlib -mcpu=cortex-a72+nosimd
+CLANG_FLAGS = -Wall -O2 -ffreestanding -nostdinc -nostdlib -mcpu=cortex-a76+nosimd
 
 
 # Default target
