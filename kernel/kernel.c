@@ -1,6 +1,12 @@
-int main() {
-    // printf("Kernel Loaded!\n");
-    while(1);
+#include "uart.h"
 
-    return 0;
+int main() {
+  uart_init();
+  char *s = "Hello, from Raspberry Pi 5!\n";
+
+  while (1) {
+    uart_puts(s);
+  }
+
+  return 0;
 }
