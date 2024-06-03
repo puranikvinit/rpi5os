@@ -1,3 +1,9 @@
 This text file contains the changes/additions to the config.txt file of the pi5 to get this kernel running.
 
+
+To enable 64-bit mode for the processor.
 arm_64bit=1
+
+By default, the PCIe X4 interface is reset before loading the kernel so that the PCIe RC is in a clean state.
+Hence, to avoid the PCIe translations to the register addresses specified in the source from the AP, disable the reset.
+pciex4_reset=0
