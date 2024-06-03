@@ -19,20 +19,20 @@ enum {
       0x2faf080, // Clock Frequency of dedicated UART clock (clk_uart) - 50MHz
 
   // Base address of the UART0 registers
-  UART1_BASE = BAR1_BASE + (0x40030000 - MAP_START),
-  UART1_CR = UART1_BASE + 0x030, // UART Control Register (WIDTH: 16 bits)
+  UART0_BASE = BAR1_BASE + (0x40030000 - MAP_START),
+  UART0_CR = UART0_BASE + 0x030, // UART Control Register (WIDTH: 16 bits)
   // [9] RXE - RX enable
   // [8] TXE - TX enable
   // [0] UARTE - UART enable
 
-  UART1_IBRD =
-      UART1_BASE + 0x024, // Integer Baud Rate Register (WIDTH: 16 bits)
-  UART1_FBRD =
-      UART1_BASE + 0x028, // Fractional Baud Rate Register (WIDTH: 6 bits)
-  UART1_LCR_H = UART1_BASE + 0x02c, // Line Control Register (WIDTH: 8 bits)
+  UART0_IBRD =
+      UART0_BASE + 0x024, // Integer Baud Rate Register (WIDTH: 16 bits)
+  UART0_FBRD =
+      UART0_BASE + 0x028, // Fractional Baud Rate Register (WIDTH: 6 bits)
+  UART0_LCR_H = UART0_BASE + 0x02c, // Line Control Register (WIDTH: 8 bits)
 
-  UART1_DR = UART1_BASE + 0x000, // Data Register (WIDTH: 8 bits)
-  UART1_FR = UART1_BASE + 0x018, // Flag Register (WIDTH: 9 bits)
+  UART0_DR = UART0_BASE + 0x000, // Data Register (WIDTH: 8 bits)
+  UART0_FR = UART0_BASE + 0x018, // Flag Register (WIDTH: 9 bits)
                                  // [7] TXFE - TX FIFO empty
                                  // [6] RXFF - RX FIFO full
                                  // [5] TXFF - TX FIFO full
