@@ -60,3 +60,12 @@ void int_to_str(int num, char *buffer) {
 
   buffer[str_length(buffer)] = '\0';
 }
+
+void str_remove_trailing_spaces(char *str) {
+  int str_ptr = 0;
+  for (; str[str_ptr] != '\0'; str_ptr++)
+    ;
+
+  while (str[str_ptr - 1] == 32)
+    str[--str_ptr] = '\0';
+}

@@ -34,4 +34,6 @@ int str_length(const char *s);
  *  \param `dest` destination string*/
 void str_concat(char *src, char *dest);
 
+void str_remove_trailing_spaces(char *str);
+
 #endif // !STRING_H
