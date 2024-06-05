@@ -1,7 +1,7 @@
 C_FILES = $(wildcard kernel/src/*.c)
 C_OBJ_FILES = $(C_FILES:.c=.o)
 
-ASM_FILES = $(wildcard kernel/src/*.S)
+ASM_FILES = $(wildcard kernel/src/core/*.S)
 ASM_OBJ_FILES = $(ASM_FILES:.S=.o)
 
 LLVM_PATH = /opt/homebrew/opt/llvm/bin/

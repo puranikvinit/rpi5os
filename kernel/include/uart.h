@@ -1,7 +1,7 @@
 #ifndef UART_H
 #define UART_H
 
-#include "mmio.h"
+#include "core/mmio.h"
 
 // ARM PrimeCell (PL011) UART (Revision r1p5) Implementation
 
