@@ -36,4 +36,6 @@ void str_concat(char *src, char *dest);
 
 void str_remove_trailing_spaces(char *str);
 
+void str_empty(char *str);
+
 #endif // !STRING_H

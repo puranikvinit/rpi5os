@@ -1,4 +1,4 @@
-#include "string.h"
+#include "util/string.h"
 
 int str_length(const char *s) {
   register const char *str;
@@ -68,4 +68,9 @@ void str_remove_trailing_spaces(char *str) {
 
   while (str[str_ptr - 1] == 32)
     str[--str_ptr] = '\0';
+}
+
+void str_empty(char *str) {
+  for (int i = 0; i < str_length(str); i++)
+    str[i] = '\0';
 }

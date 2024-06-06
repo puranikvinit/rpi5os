@@ -7,3 +7,9 @@ mmio_read_32:
 mmio_write_32:
 	str w1,[x0]
 	ret
+
+.globl get_current_exception_level // Function to get the current exception level
+get_current_exception_level:
+  mrs x0, CurrentEL
+  lsr x0, x0, #2
+  ret

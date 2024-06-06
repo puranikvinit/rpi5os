@@ -1,6 +1,6 @@
-#include "core/core.h"
-#include "string.h"
-#include "uart.h"
+#include "io/mmio.h"
+#include "io/uart.h"
+#include "util/string.h"
 
 long semaphore = 0;
 
