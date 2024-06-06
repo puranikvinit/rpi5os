@@ -10,6 +10,6 @@ irq_enable:
   ret
 
 .globl irq_disable
-isr_disable:
+irq_disable:
   msr daifset, #2
   ret
