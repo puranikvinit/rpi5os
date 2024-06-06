@@ -1,3 +1,4 @@
+#include "core/core.h"
 #include "string.h"
 #include "uart.h"
 
@@ -13,13 +14,8 @@ int kernel_main(unsigned int core_id) {
   uart_putc('\n');
 
   char buff[5] = "";
-  int_to_str(53, buff);
+  int_to_str(get_current_exception_level(), buff);
   uart_puts(buff);
-
-  while (semaphore != core_id) {
-  }
-
-  semaphore++;
 
   while (1) {
   }
