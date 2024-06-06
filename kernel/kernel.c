@@ -1,3 +1,4 @@
+#include "interrupts/vector_init.h"
 #include "io/mmio.h"
 #include "io/uart.h"
 #include "util/string.h"
@@ -16,6 +17,12 @@ int kernel_main(unsigned int core_id) {
   char buff[5] = "";
   int_to_str(get_current_exception_level(), buff);
   uart_puts(buff);
+
+  vector_table_init();
+  uart_puts("Vector Table Initialized\n\0");
+
+  irq_enable();
+  uart_puts("IRQs Enabled\n\0");
 
   while (1) {
   }
