@@ -1,4 +1,4 @@
-#include "io/uart.h"
+#include "peripherals/uart.h"
 #include "util/string.h"
 
 void display_message(int interrupt_type, unsigned long elr, unsigned long esr) {

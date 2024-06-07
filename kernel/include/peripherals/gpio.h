@@ -1,7 +1,7 @@
 #ifndef GPIO_H
 #define GPIO_H
 
-#include "io/mmio.h"
+#include "mmio.h"
 
 // Register addresses extracted from the Raspberry Pi 5 Devicetree
 

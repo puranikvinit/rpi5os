@@ -1,5 +1,5 @@
-#include "io/gpio.h"
-#include "io/mmio.h"
+#include "peripherals/gpio.h"
+#include "mmio.h"
 
 int gpio_init(int gpio_pin_number, int gpio_function, int gpio_pull_up,
               int gpio_pull_down, int gpio_disable_output,

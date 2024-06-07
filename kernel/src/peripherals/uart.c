@@ -1,6 +1,6 @@
-#include "io/uart.h"
-#include "io/gpio.h"
-#include "io/mmio.h"
+#include "peripherals/uart.h"
+#include "mmio.h"
+#include "peripherals/gpio.h"
 
 uart_baud_rate_t _calculate_baud_rate(long baud_rate) {
   double baud_rate_divisor = (double)UART_CLOCK_FREQ / (0x10 * baud_rate);
