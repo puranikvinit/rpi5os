@@ -7,6 +7,9 @@ enum {
   BAR1_BASE = 0x1f00000000, // System Base address to which APB0 PERIPHERALS
                             // base address of RP1 are mapped
   MAP_START = 0x40000000, // Peripheral Base in the RP1 Processor Address space
+
+  SOC_PERIPHERAL_BASE = 0x107c000000, // Base address of the peripherals which
+                                      // are on the SoC directly
 };
 
 // Member APIs
