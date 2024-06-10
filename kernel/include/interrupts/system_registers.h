@@ -46,7 +46,9 @@
 #define SCTLR_MMU_DISABLED (0 << 0)
 #define SCTLR_MMU_ENABLED (1 << 0)
 
-#define SCTLR_VALUE_MMU_DISABLED (SCTLR_RESERVED | SCTLR_EE_LITTLE_ENDIAN | SCTLR_I_CACHE_DISABLED | SCTLR_D_CACHE_DISABLED | SCTLR_MMU_DISABLED)
+#define SCTLR_VALUE_MMU_DISABLED                                               \
+  (SCTLR_RESERVED | SCTLR_EE_LITTLE_ENDIAN | SCTLR_I_CACHE_DISABLED |          \
+   SCTLR_D_CACHE_DISABLED | SCTLR_MMU_DISABLED)
 
 // ******************************************************************************
 //
