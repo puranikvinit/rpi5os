@@ -35,7 +35,7 @@ int str_to_int(char *s) {
   return is_negative ? (-1 * res) : res;
 }
 
-void int_to_str(int num, char *buffer) {
+void int_to_str(long num, char *buffer) {
   int is_negative = (num < 0);
   num = is_negative ? (num * -1) : num;
 
