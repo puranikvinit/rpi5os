@@ -52,6 +52,17 @@
 
 // ******************************************************************************
 //
+// PREDEFINED CONFIGS FOR HCR_EL2 (Hypervisor Configuration Register for EL2)
+//
+// [31]RW (0b1) - Execution state for EL1 is AArch64.
+//
+// ******************************************************************************
+
+#define HCR_RW (#0x8000 << 16)
+#define HCR_VALUE (HCR_RW)
+
+// ******************************************************************************
+//
 // PREDEFINED CONFIGS FOR SPSR_EL2 (Saved Program Status Register for EL2)
 //
 // [8:6]MASK_ALL (0b111) - Mask all interrupts after switch to EL1.
