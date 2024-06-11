@@ -11,13 +11,13 @@ vector_table_init:
 // [I] - IRQ Mask
 // [F] - FIQ Mask
 .globl interrupts_enable
-irq_enable:
+interrupts_enable:
   msr daifclr, #7
   ret
 
 // Disable interrupts
 .globl interrupts_disable
-irq_disable:
+interrupts_disable:
   msr daifset, #7
   ret
 
