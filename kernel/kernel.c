@@ -1,5 +1,7 @@
+#include "interrupts/gic.h"
 #include "interrupts/vector_init.h"
 #include "mmio.h"
+#include "peripherals/system_timer.h"
 #include "peripherals/uart.h"
 #include "util/string.h"
 
@@ -19,15 +21,24 @@ int kernel_main(unsigned int core_id) {
   uart_puts("Current Exception Level: \0");
   uart_puts(buff);
   uart_putc('\n');
-  str_empty(buff);
 
   vector_table_init();
   uart_puts("Vector Table Initialized!\n\0");
 
-  irq_enable();
+  gic_init();
+  uart_puts("GIC Initialized!\n\0");
+
+  timer_init();
+  uart_puts("Timer Initialized!\n\0");
+
+  interrupts_enable();
   uart_puts("IRQs Enabled!\n\0");
 
+  enable_irq_line(SYSTEM_TIMER_IRQ_1);
+  uart_puts("IRQ Handler Registered!\n\0");
+
   while (1) {
+    uart_puts("Waiting for interrupt...\n\0");
   }
 
   return 0;
