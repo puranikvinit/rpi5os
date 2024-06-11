@@ -26,9 +26,12 @@ core_init_delay:  sub x0, x0, #1
 core_hang:  wfe // Wait for event, and loop indefinitely
             b core_hang
 
-
+// Initialise required system registers required before jumping into EL1 exception level.
 intr_init:  ldr x0, =SCTLR_VALUE_MMU_DISABLED
             msr sctlr_el1, x0
+
+            ldr x0, =HCR_VALUE
+            msr hcr_el2, x0
  
             ldr x0, =SPSR_VALUE
             msr spsr_el2, x0
