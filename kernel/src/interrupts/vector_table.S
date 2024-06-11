@@ -1,13 +1,15 @@
 #include "interrupts/vector_table.h"
 
+// Macro to define a vector entry in the vector table
 .macro vector_entry type
 
-.align 7
+// Align the vector table to 0x80 bytes, as required by the bootstub.
+.balign 0x80
 b \type
 
 .endm
 
-
+// Macro to define instruction sequence before the peocessor enters the interrupt handler
 .macro interrupt_entry
 
 sub sp, sp, #STACK_FRAME_SIZE
@@ -28,12 +30,25 @@ stp x22, x23, [sp, #16*11]
 stp x24, x25, [sp, #16*12]
 stp x26, x27, [sp, #16*13]
 stp x28, x29, [sp, #16*14]
-str x30, [sp, #16*15]
+
+// Save ELR_EL1 and SPSR_EL1
+add x21, sp, #STACK_FRAME_SIZE
+mrs x22, ELR_EL1
+mrs x23, SPSR_EL1
+
+stp x30, x21, [sp, #16*15]
+stp x22, x23, [sp, #16*16]
 
 .endm
 
-
+// Macro to define instruction sequence after the processor exits the interrupt handler
 .macro interrupt_exit
+
+// Restore ELR_EL1 and SPSR_EL1
+ldp	x22, x23, [sp, #16 * 16]
+ldp	x30, x21, [sp, #16 * 15]
+msr	elr_el1, x22
+msr	spsr_el1, x23
 
 // Restore registers x0-x30
 ldp x0, x1, [sp, #16*0]
@@ -51,7 +66,6 @@ ldp x22, x23, [sp, #16*11]
 ldp x24, x25, [sp, #16*12]
 ldp x26, x27, [sp, #16*13]
 ldp x28, x29, [sp, #16*14]
-ldr x30, [sp, #16*15]
 
 add sp, sp, #STACK_FRAME_SIZE
 
@@ -59,7 +73,7 @@ eret
 
 .endm
 
-
+// Macro to initialise a valid defined interrupt handler
 .macro handle_valid_interrupt_entry handler
 
 interrupt_entry
@@ -68,6 +82,7 @@ interrupt_exit
 
 .endm
 
+// Macro to initialise an invalid interrupt handler
 .macro handle_invalid_interrupt_entry type
 
 interrupt_entry
@@ -81,8 +96,10 @@ b error_hang
 
 .endm
 
-.align 11
+// Align the vector table to 0x800 bytes, as required by the bootstub.
+.balign 0x800
 
+// Define the vector table
 .globl vector_table
 vector_table:
   vector_entry el1t_sync_exception
@@ -122,7 +139,7 @@ el1h_sync_exception:
   handle_invalid_interrupt_entry EL1h_SYNC_EXCEPTION
 
 el1h_irq_exception:
-  handle_valid_interrupt_entry el1h_irq_handler
+  handle_valid_interrupt_entry handle_irq
 
 el1h_fiq_exception:
   handle_invalid_interrupt_entry EL1h_FIQ_EXCEPTION
@@ -135,7 +152,7 @@ el0_64_sync_exception:
   handle_invalid_interrupt_entry EL0_64_SYNC_EXCEPTION
 
 el0_64_irq_exception:
-  handle_invalid_interrupt_entry EL0_64_IRQ_EXCEPTION
+  handle_valid_interrupt_entry handle_irq
 
 el0_64_fiq_exception:
   handle_invalid_interrupt_entry EL0_64_FIQ_EXCEPTION
@@ -156,5 +173,6 @@ el0_32_fiq_exception:
 el0_32_serror_exception:
   handle_invalid_interrupt_entry EL0_32_SERROR_EXCEPTION
 
+// Loop indefinitely if an error occurs, especially when an invalid interrupt raised
 .globl error_hang
 error_hang: b error_hang
