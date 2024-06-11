@@ -77,4 +77,4 @@ kernel8.img: boot.o mmio.o $(PERIPHERALS_C_OBJ_FILES) $(PERIPHERALS_ASM_OBJ_FILE
 
 # clean previous build and residual files
 clean:
-	/bin/rm -f *.o *.elf *.img kernel/src/*.o kernel/src/interrupts/*.o kernel/src/io/*.o kernel/src/util/*o kernel/src/interrupts/handlers/*.o > /dev/null 2> /dev/null || true
+	/bin/rm -f *.o *.elf *.img kernel/src/*.o kernel/src/interrupts/*.o kernel/src/peripherals/*.o kernel/src/util/*o kernel/src/interrupts/handlers/*.o > /dev/null 2> /dev/null || true
