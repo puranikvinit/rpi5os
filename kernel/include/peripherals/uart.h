@@ -1,16 +1,16 @@
 #ifndef UART_H
 #define UART_H
 
-#include "mmio.h"
+#include "rp1.h"
 
 // ARM PrimeCell (PL011) UART (Revision r1p5) Implementation
 
 // GPIO pin mapping:
 // GPIO function selected for this implementation - a4
-// UART1_TX - GPIO pin 14
-// UART1_RX - GPIO pin 15
-// UART1_CTS - GPIO pin 16
-// UART1_RTS - GPIO pin 17
+// UART0_TX - GPIO pin 14
+// UART0_RX - GPIO pin 15
+// UART0_CTS - GPIO pin 16
+// UART0_RTS - GPIO pin 17
 
 // Register addresses extracted from the Raspberry Pi 5 Devicetree
 
@@ -38,6 +38,18 @@ enum {
                                  // [5] TXFF - TX FIFO full
                                  // [4] RXFE - RX FIFO empty
                                  // [3] BUSY - UART busy
+
+  UART0_IFLS = UART0_BASE + 0x034, // Interrupt FIFO Level Select Register
+  // [5:3] RXIFLSEL - RX FIFO interrupt level select bits
+  // [2:0] TXIFLSEL - TX FIFO interrupt level select bits
+
+  UART0_IMSC = UART0_BASE + 0x038, // Interrupt Mask Set/Clear Register
+  // [5] TXIM - TX interrupt mask
+  // [4] RXIM - RX interrupt mask
+
+  UART0_ICR = UART0_BASE + 0x044, // Interrupt Clear Register
+  // [5] TXIC - TX interrupt clear
+  // [4] RXIC - RX interrupt clear
 };
 
 /*! \brief Structure to store the baud rate values.

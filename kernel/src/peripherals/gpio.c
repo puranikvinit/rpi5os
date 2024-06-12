@@ -3,7 +3,8 @@
 
 int gpio_init(int gpio_pin_number, int gpio_function, int gpio_pull_up,
               int gpio_pull_down, int gpio_disable_output,
-              int gpio_enable_input) {
+              int gpio_enable_input, int gpio_interrupt_enable,
+              int gpio_interrupt_force) {
   long gpio_pin_funcsel = GPIO_BASE + GPIO0_FUNCSEL_OFFSET +
                           (gpio_pin_number)*GPIO_FUNCSEL_OFFSET_INCREMENT;
   long gpio_pin_pad =
@@ -18,6 +19,8 @@ int gpio_init(int gpio_pin_number, int gpio_function, int gpio_pull_up,
     return -1;
   // set the function select bits [4:0] for the pin.
   func |= gpio_function;
+
+  func &= ~(3 << 22);
 
   mmio_write_32(gpio_pin_funcsel, func);
 
@@ -42,6 +45,16 @@ int gpio_init(int gpio_pin_number, int gpio_function, int gpio_pull_up,
           (gpio_pull_up << 3) | (gpio_pull_down << 2));
 
   mmio_write_32(gpio_pin_pad, pad);
+
+  // Set the enable status of the interrupt for the GPIO pin
+  unsigned int int_enable = mmio_read_32(GPIO_PCIE_INT_ENABLE) |
+                            (gpio_interrupt_enable << gpio_pin_number);
+  mmio_write_32(GPIO_PCIE_INT_ENABLE, int_enable);
+
+  // Set the force status of the interrupt for the GPIO pin
+  unsigned int int_force = mmio_read_32(GPIO_PCIE_INT_FORCE) |
+                           (gpio_interrupt_force << gpio_pin_number);
+  mmio_write_32(GPIO_PCIE_INT_FORCE, int_force);
 
   return 0;
 }

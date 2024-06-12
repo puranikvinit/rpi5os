@@ -1,7 +1,7 @@
 #ifndef GPIO_H
 #define GPIO_H
 
-#include "mmio.h"
+#include "rp1.h"
 
 // Register addresses extracted from the Raspberry Pi 5 Devicetree
 
@@ -25,7 +25,14 @@ enum {
   // [2] pull-down enable
 
   GPIO_PAD0_OFFSET = 0x04,
-  GPIO_PAD_OFFSET_INCREMENT = 0x04
+  GPIO_PAD_OFFSET_INCREMENT = 0x04,
+
+  GPIO_PCIE_INT_ENABLE =
+      GPIO_BASE + 0x11c, // PCIe (host processor) GPIO interrupt enable register
+  GPIO_PCIE_INT_FORCE =
+      GPIO_BASE + 0x120, // PCIe (host processor) GPIO interrupt force register
+  GPIO_PCIE_INT_STATUS =
+      GPIO_BASE + 0x124, // PCIe (host processor) GPIO interrupt status register
 };
 
 // Member APIs
@@ -38,12 +45,15 @@ enum {
  * \param `gpio_pull_down` Enable pull-down resistor for the pin.
  * \param `gpio_disable_output` Disable output for the pin.
  * \param `gpio_enable_input` Enable input for the pin.
+ * \param `gpio_interrupt_enable` Enable interrupt for the pin.
+ * \param `gpio_interrupt_force` Force interrupt for the pin.
  *
  * \return `0` if the GPIO pin is initialized successfully, `-1` otherwise.
  */
 int gpio_init(int gpio_pin_number, int gpio_function, int gpio_pull_up,
               int gpio_pull_down, int gpio_disable_output,
-              int gpio_enable_input);
+              int gpio_enable_input, int gpio_interrupt_enable,
+              int gpio_interrupt_force);
 // NOTE: If both pull-up and pull-down are disabled, then the pin is in a
 // pull-none state.
 

@@ -20,14 +20,18 @@ void uart_init() {
   // Pull-down = 0
   // Output disable = 0
   // Input enable = 1
-  gpio_init(14, 4, 0, 0, 0, 1);
+  // Interrupt enable = 1
+  // Interrupt force = 0
+  gpio_init(14, 4, 0, 0, 0, 1, 1, 0);
   // GPIO15 - UART0_RX
   // GPIO Pin Function = a4
   // Pull-up = 0
   // Pull-down = 0
   // Output disable = 0
   // Input enable = 1
-  gpio_init(15, 4, 0, 0, 0, 1);
+  // Interrupt enable = 1
+  // Interrupt force = 0
+  gpio_init(15, 4, 0, 0, 0, 1, 1, 0);
 
   // NOTE: Flow control not yet implemented, hence the flow control pins are not
   // initialized.
@@ -48,6 +52,17 @@ void uart_init() {
   uart_lcr_h |= (3 << 5); // 8-bit word length
   uart_lcr_h |= (1 << 4); // enable FIFO buffer
   mmio_write_32(UART0_LCR_H, uart_lcr_h);
+
+  // Set the Interrupt FIFO level select register
+  unsigned int uart_ifls = mmio_read_32(UART0_IFLS);
+  uart_ifls &= ~(7 << 3); // Clear RX FIFO interrupt level bits
+  uart_ifls |= (2 << 3);  // Set RX FIFO interrupt level to 1/2 full
+  mmio_write_32(UART0_IFLS, uart_ifls);
+
+  // Set the Interrupt Mask Set/Clear Register
+  unsigned int uart_imsc = mmio_read_32(UART0_IMSC);
+  uart_imsc &= ~(1 << 4); // Unmask RX interrupt
+  mmio_write_32(UART0_IMSC, uart_imsc);
 
   // Enable UART interface
   uart_control &= ~(1 | (3 << 8));
