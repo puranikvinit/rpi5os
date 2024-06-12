@@ -37,6 +37,12 @@ int kernel_main(unsigned int core_id) {
   enable_irq_line(SYSTEM_TIMER_IRQ_1);
   uart_puts("IRQ Handler Registered!\n\0");
 
+  enable_irq_line(PCIE_IRQ_1);
+  enable_irq_line(PCIE_IRQ_2);
+  enable_irq_line(PCIE_IRQ_3);
+  enable_irq_line(PCIE_IRQ_4);
+  uart_puts("PCIe IRQ Handler Registered!\n\0");
+
   while (1) {
     uart_puts("Waiting for interrupt...\n\0");
   }

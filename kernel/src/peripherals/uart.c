@@ -56,12 +56,12 @@ void uart_init() {
   // Set the Interrupt FIFO level select register
   unsigned int uart_ifls = mmio_read_32(UART0_IFLS);
   uart_ifls &= ~(7 << 3); // Clear RX FIFO interrupt level bits
-  uart_ifls |= (2 << 3);  // Set RX FIFO interrupt level to 1/2 full
+  uart_ifls |= (0 << 3);  // Set RX FIFO interrupt level to 1/8 full
   mmio_write_32(UART0_IFLS, uart_ifls);
 
   // Set the Interrupt Mask Set/Clear Register
   unsigned int uart_imsc = mmio_read_32(UART0_IMSC);
-  uart_imsc &= ~(1 << 4); // Unmask RX interrupt
+  uart_imsc &= ~(3 << 4); // Unmask TX and RX interrupt
   mmio_write_32(UART0_IMSC, uart_imsc);
 
   // Enable UART interface
@@ -95,4 +95,12 @@ char uart_getc() {
 void uart_puts(const char *s) {
   for (int i = 0; s[i] != '\0'; i++)
     uart_putc((char)s[i]);
+}
+
+void handle_uart_irq() {
+  mmio_write_32(UART0_ICR, 1 << 4); // Clear the RX interrupt
+  uart_puts("UART Interrupt Received!\n\0");
+
+  uart_putc(
+      uart_getc()); // Echo the received character and clear the RX FIFO queue.
 }

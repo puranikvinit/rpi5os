@@ -94,4 +94,7 @@ char uart_getc();
  */
 void uart_puts(const char *s);
 
+/*! \brief Handle the UART0 interrupt. */
+void handle_uart_irq();
+
 #endif // !UART_H

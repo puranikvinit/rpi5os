@@ -1,5 +1,6 @@
 #include "interrupts/gic.h"
 #include "mmio.h"
+#include "peripherals/rp1.h"
 #include "peripherals/system_timer.h"
 #include "peripherals/uart.h"
 
@@ -62,6 +63,11 @@ void handle_irq() {
   case SYSTEM_TIMER_IRQ_1:
     mmio_write_32(GIC_C_EOI, interrupt_id);
     handle_timer_irq();
+    break;
+
+  case PCIE_IRQ_4:
+    mmio_write_32(GIC_C_EOI, interrupt_id);
+    handle_uart_irq();
     break;
 
   default:
