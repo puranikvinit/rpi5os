@@ -1,6 +1,7 @@
 #include "peripherals/system_timer.h"
 #include "mmio.h"
 #include "peripherals/uart.h"
+#include "scheduler/sched.h"
 
 unsigned int curVal = 0;
 
@@ -18,4 +19,5 @@ void handle_timer_irq() {
   mmio_write_32(SYSTEM_TIMER_C1, curVal);
   mmio_write_32(SYSTEM_TIMER_CTRL_STATUS, SYSTEM_TIMER_MASKBIT);
   uart_puts("Timer interrupt received\n\0");
+  timer_tick();
 }
