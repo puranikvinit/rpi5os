@@ -1,7 +1,7 @@
 #ifndef SYSTEM_TIMER_H
 #define SYSTEM_TIMER_H
 
-#include "mmio.h"
+#include "ap.h"
 
 #define SYSTEM_TIMER_TRIGGER_INTERVAL 200000
 
