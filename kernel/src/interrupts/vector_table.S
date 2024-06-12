@@ -32,12 +32,11 @@ stp x26, x27, [sp, #16*13]
 stp x28, x29, [sp, #16*14]
 
 // Save ELR_EL1 and SPSR_EL1
-add x21, sp, #STACK_FRAME_SIZE
 mrs x22, ELR_EL1
 mrs x23, SPSR_EL1
 
-stp x30, x21, [sp, #16*15]
-stp x22, x23, [sp, #16*16]
+stp x30, x22, [sp, #16*15]
+str x23, [sp, #16*16]
 
 .endm
 
@@ -45,8 +44,8 @@ stp x22, x23, [sp, #16*16]
 .macro interrupt_exit
 
 // Restore ELR_EL1 and SPSR_EL1
-ldp	x22, x23, [sp, #16 * 16]
-ldp	x30, x21, [sp, #16 * 15]
+ldr	x23, [sp, #16 * 16]
+ldp	x30, x22, [sp, #16 * 15]
 msr	elr_el1, x22
 msr	spsr_el1, x23
 
@@ -176,3 +175,4 @@ el0_32_serror_exception:
 // Loop indefinitely if an error occurs, especially when an invalid interrupt raised
 .globl error_hang
 error_hang: b error_hang
+
