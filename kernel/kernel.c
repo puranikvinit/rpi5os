@@ -3,9 +3,20 @@
 #include "mmio.h"
 #include "peripherals/system_timer.h"
 #include "peripherals/uart.h"
+#include "scheduler/fork.h"
+#include "scheduler/sched.h"
 #include "util/string.h"
 
 long semaphore = 0;
+
+void test_process(char *text) {
+  while (1) {
+    for (int i = 0; i < 5; i++) {
+      uart_putc(text[i]);
+    }
+    uart_putc('\n');
+  }
+}
 
 int kernel_main(unsigned int core_id) {
   if (core_id == 0) {
@@ -37,14 +48,26 @@ int kernel_main(unsigned int core_id) {
   enable_irq_line(SYSTEM_TIMER_IRQ_1);
   uart_puts("IRQ Handler Registered!\n\0");
 
-  enable_irq_line(PCIE_IRQ_1);
-  enable_irq_line(PCIE_IRQ_2);
-  enable_irq_line(PCIE_IRQ_3);
-  enable_irq_line(PCIE_IRQ_4);
-  uart_puts("PCIe IRQ Handler Registered!\n\0");
+  // enable_irq_line(PCIE_IRQ_1);
+  // enable_irq_line(PCIE_IRQ_2);
+  // enable_irq_line(PCIE_IRQ_3);
+  // enable_irq_line(PCIE_IRQ_4);
+  // uart_puts("PCIe IRQ Handler Registered!\n\0");
+
+  int res = fork_process((unsigned long)&test_process, (unsigned long)"12345");
+  if (res) {
+    uart_puts("Error forking process 1!\n\0");
+    return 1;
+  }
+
+  res = fork_process((unsigned long)&test_process, (unsigned long)"ABCDE");
+  if (res) {
+    uart_puts("Error forking process 2!\n\0");
+    return 1;
+  }
 
   while (1) {
-    uart_puts("Waiting for interrupt...\n\0");
+    scheduler_init();
   }
 
   return 0;
