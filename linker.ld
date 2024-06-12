@@ -17,13 +17,6 @@ SECTIONS
         __bss_end = .; /* End address of the BSS section */
     }
 
-    .stack (NOLOAD) : { /* Section for stack */
-        . = ALIGN(16); /* Align the current location pointer to the next 8bit boundary */
-        __stack_start = .; /* Start address of the stack */
-        . += 0x1000; /* Reserve 4KiB for the stack */
-        . = ALIGN(16);
-        __stack_end = .; /* End address of the stack */
-    }
 
     _end = .; /* End address of loaded program data */
     
@@ -35,4 +28,3 @@ SECTIONS
 *  for example, merge identical constants across various files into a single section to save space and access times */
 
 __bss_size = (__bss_end - __bss_start)>>3; /* Size of the BSS section */
-__stack_size = (__stack_end - __stack_start); /* Size of the stack */

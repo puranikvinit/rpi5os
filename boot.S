@@ -50,12 +50,12 @@ bss_loop: cbz x2, stack_init // Skip initialization of BSS variables if the size
           sub x2, x2, #1
           cbnz x2, bss_loop // Iterate for all variables of the BSS section
 
-stack_init: adr x1, __stack_end // Load the end address of the stack for the primary core, 
+stack_init: mov sp, #1 << 22 // Load the end address of the stack for the primary core, 
                         // defined in the linker (stack grows downwards)
     
-            adr x3, __stack_size // Load the size of the stack, calculated and defined in the linker
-            mul x4, x5, x3 // Calculate the offset for the current core
-            add x1, x4, x1 // Calculate the end address of the stack for the current core.
+            // adr x3, __stack_size // Load the size of the stack, calculated and defined in the linker
+            // mul x4, x5, x3 // Calculate the offset for the current core
+            // add x1, x4, x1 // Calculate the end address of the stack for the current core.
 
             mov sp, x1 // Store the start address in the stack ptr.
     // The first element of the stack contains the start address, and from the
