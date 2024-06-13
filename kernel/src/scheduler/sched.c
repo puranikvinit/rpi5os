@@ -1,5 +1,6 @@
 #include "scheduler/sched.h"
 #include "interrupts/vector_init.h"
+#include "scheduler/page_manager.h"
 
 static task_struct_t init_task = INIT_TASK;
 task_struct_t *current_task = &(init_task);
@@ -73,4 +74,21 @@ void task_init() {
   // Any other initialisation that needs to be necessarily done before the task
   // is preempted.
   preempt_enable();
+}
+
+void task_exit() {
+  preempt_disable();
+
+  for (int i = 0; i < MAX_TASKS; i++) {
+    if (task[i] == current_task) {
+      task[i]->state = TASK_STOPPED;
+      break;
+    }
+  }
+  if (current_task->stack) {
+    free_page(current_task->stack);
+  }
+
+  preempt_enable();
+  scheduler_init();
 }

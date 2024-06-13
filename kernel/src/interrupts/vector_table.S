@@ -9,8 +9,9 @@ b \type
 
 .endm
 
+.globl interrupt_entry
 // Macro to define instruction sequence before the peocessor enters the interrupt handler
-.macro interrupt_entry
+.macro interrupt_entry el
 
 sub sp, sp, #STACK_FRAME_SIZE
 
@@ -31,21 +32,33 @@ stp x24, x25, [sp, #16*12]
 stp x26, x27, [sp, #16*13]
 stp x28, x29, [sp, #16*14]
 
+.if \el == 0
+mrs x21, sp_el0
+.else
+add x21, sp, #STACK_FRAME_SIZE
+.endif
+
 // Save ELR_EL1 and SPSR_EL1
 mrs x22, ELR_EL1
 mrs x23, SPSR_EL1
 
-stp x30, x22, [sp, #16*15]
-str x23, [sp, #16*16]
+stp x30, x21, [sp, #16*15]
+stp x22, x23, [sp, #16*16]
 
 .endm
 
+.globl interrupt_exit
 // Macro to define instruction sequence after the processor exits the interrupt handler
-.macro interrupt_exit
+.macro interrupt_exit el
 
 // Restore ELR_EL1 and SPSR_EL1
-ldr	x23, [sp, #16 * 16]
-ldp	x30, x22, [sp, #16 * 15]
+ldp	x22, x23, [sp, #16 * 16]
+ldp	x30, x21, [sp, #16 * 15]
+
+.if \el == 0
+msr sp_el0, x21
+.endif
+
 msr	elr_el1, x22
 msr	spsr_el1, x23
 
@@ -73,18 +86,18 @@ eret
 .endm
 
 // Macro to initialise a valid defined interrupt handler
-.macro handle_valid_interrupt_entry handler
+.macro handle_valid_interrupt_entry el, handler
 
-interrupt_entry
+interrupt_entry \el
 bl \handler
-interrupt_exit
+interrupt_exit \el
 
 .endm
 
 // Macro to initialise an invalid interrupt handler
-.macro handle_invalid_interrupt_entry type
+.macro handle_invalid_interrupt_entry el, type
 
-interrupt_entry
+interrupt_entry \el
 
 mov x0, #\type
 mrs x1, ELR_EL1
@@ -122,55 +135,55 @@ vector_table:
   vector_entry el0_32_serror_exception
 
 el1t_sync_exception:
-  handle_invalid_interrupt_entry EL1t_SYNC_EXCEPTION
+  handle_invalid_interrupt_entry 1, EL1t_SYNC_EXCEPTION
 
 el1t_irq_exception:
-  handle_invalid_interrupt_entry EL1t_IRQ_EXCEPTION
+  handle_invalid_interrupt_entry 1, EL1t_IRQ_EXCEPTION
 
 el1t_fiq_exception:
-  handle_invalid_interrupt_entry EL1t_FIQ_EXCEPTION
+  handle_invalid_interrupt_entry 1, EL1t_FIQ_EXCEPTION
 
 el1t_serror_exception:
-  handle_invalid_interrupt_entry EL1t_SERROR_EXCEPTION
+  handle_invalid_interrupt_entry 1, EL1t_SERROR_EXCEPTION
 
 
 el1h_sync_exception:
-  handle_invalid_interrupt_entry EL1h_SYNC_EXCEPTION
+  handle_invalid_interrupt_entry 1, EL1h_SYNC_EXCEPTION
 
 el1h_irq_exception:
-  handle_valid_interrupt_entry handle_irq
+  handle_valid_interrupt_entry 1, handle_irq
 
 el1h_fiq_exception:
-  handle_invalid_interrupt_entry EL1h_FIQ_EXCEPTION
+  handle_invalid_interrupt_entry 1, EL1h_FIQ_EXCEPTION
 
 el1h_serror_exception:
-  handle_invalid_interrupt_entry EL1h_SERROR_EXCEPTION
+  handle_invalid_interrupt_entry 1, EL1h_SERROR_EXCEPTION
 
 
 el0_64_sync_exception:
-  handle_invalid_interrupt_entry EL0_64_SYNC_EXCEPTION
+  handle_valid_interrupt_entry 0, handle_sync
 
 el0_64_irq_exception:
-  handle_valid_interrupt_entry handle_irq
+  handle_valid_interrupt_entry 0, handle_irq
 
 el0_64_fiq_exception:
-  handle_invalid_interrupt_entry EL0_64_FIQ_EXCEPTION
+  handle_invalid_interrupt_entry 0, EL0_64_FIQ_EXCEPTION
 
 el0_64_serror_exception:
-  handle_invalid_interrupt_entry EL0_64_SERROR_EXCEPTION
+  handle_invalid_interrupt_entry 0, EL0_64_SERROR_EXCEPTION
 
 
 el0_32_sync_exception:
-  handle_invalid_interrupt_entry EL0_32_SYNC_EXCEPTION
+  handle_invalid_interrupt_entry 0, EL0_32_SYNC_EXCEPTION
 
 el0_32_irq_exception:
-  handle_invalid_interrupt_entry EL0_32_IRQ_EXCEPTION
+  handle_invalid_interrupt_entry 0, EL0_32_IRQ_EXCEPTION
 
 el0_32_fiq_exception:
-  handle_invalid_interrupt_entry EL0_32_FIQ_EXCEPTION
+  handle_invalid_interrupt_entry 0, EL0_32_FIQ_EXCEPTION
 
 el0_32_serror_exception:
-  handle_invalid_interrupt_entry EL0_32_SERROR_EXCEPTION
+  handle_invalid_interrupt_entry 0, EL0_32_SERROR_EXCEPTION
 
 // Loop indefinitely if an error occurs, especially when an invalid interrupt raised
 .globl error_hang

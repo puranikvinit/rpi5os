@@ -8,6 +8,8 @@
 #define FIRST_TASK task[0]
 #define LAST_TASK task[MAX_TASKS - 1]
 
+#define PF_KTHREAD 0x2
+
 typedef enum {
   TASK_RUNNING,
   TASK_INTERRUPTIBLE,
@@ -37,6 +39,9 @@ typedef struct {
   long counter;
   long priority;
   long skip_preempt_count;
+
+  unsigned long stack;
+  unsigned long flags;
 } task_struct_t;
 
 extern task_struct_t *current_task;
@@ -81,5 +86,6 @@ extern void switch_context(task_struct_t *prev, task_struct_t *next);
 void timer_tick();
 
 void task_init();
+void task_exit();
 
 #endif // !SCHED_H
