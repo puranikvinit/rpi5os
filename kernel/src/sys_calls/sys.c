@@ -1,0 +1,26 @@
+#include "sys_calls/sys.h"
+#include "peripherals/uart.h"
+#include "scheduler/fork.h"
+#include "scheduler/page_manager.h"
+#include "scheduler/sched.h"
+
+void sys_write(char *text) { uart_puts(text); }
+
+int sys_fork(unsigned long stack) { return fork_process(0, 0, 0, stack); }
+
+unsigned long sys_malloc() {
+  unsigned long alloc_addr = allocate_free_page();
+  if (!alloc_addr)
+    return -1;
+
+  return alloc_addr;
+}
+
+void sys_proc_exit() { task_exit(); }
+
+void *const sys_call_table[] = {
+    &sys_write,
+    &sys_fork,
+    &sys_malloc,
+    &sys_proc_exit,
+};
