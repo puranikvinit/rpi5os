@@ -5,6 +5,7 @@
 #include "peripherals/uart.h"
 #include "scheduler/fork.h"
 #include "scheduler/sched.h"
+#include "sys_calls/sys.h"
 #include "util/string.h"
 
 long semaphore = 0;
@@ -15,6 +16,48 @@ void test_process(char *text) {
       uart_putc(text[i]);
     }
     uart_putc('\n');
+  }
+}
+
+void user_process() {
+  char *buff = "User Process - Parent\n\0";
+  call_sys_write(buff);
+
+  unsigned long child_stack = call_sys_malloc();
+  if (child_stack < 0) {
+    char *err = "Error allocating memory for child stack!\n\0";
+    call_sys_write(err);
+  }
+
+  int err_code = call_sys_fork((unsigned long)&test_process,
+                               (unsigned long)"12345", child_stack);
+  if (err_code < 0) {
+    char *err = "Error forking child process!\n\0";
+    call_sys_write(err);
+  }
+
+  child_stack = call_sys_malloc();
+  if (child_stack < 0) {
+    char *err = "Error allocating memory for child stack!\n\0";
+    call_sys_write(err);
+  }
+
+  err_code = call_sys_fork((unsigned long)&test_process, (unsigned long)"ABCDE",
+                           child_stack);
+  if (err_code < 0) {
+    char *err = "Error forking child process!\n\0";
+    call_sys_write(err);
+  }
+
+  call_sys_proc_exit();
+}
+
+void kernel_process() {
+  uart_puts("Kernel Process\n\0");
+
+  int err_code = move_to_user_mode((unsigned long)&user_process);
+  if (err_code) {
+    uart_puts("Error moving to user mode!\n\0");
   }
 }
 
@@ -54,15 +97,9 @@ int kernel_main(unsigned int core_id) {
   // enable_irq_line(PCIE_IRQ_4);
   // uart_puts("PCIe IRQ Handler Registered!\n\0");
 
-  int res = fork_process((unsigned long)&test_process, (unsigned long)"12345");
-  if (res) {
-    uart_puts("Error forking process 1!\n\0");
-    return 1;
-  }
-
-  res = fork_process((unsigned long)&test_process, (unsigned long)"ABCDE");
-  if (res) {
-    uart_puts("Error forking process 2!\n\0");
+  int res = fork_process(PF_KTHREAD, (unsigned long)&kernel_process, 0, 0);
+  if (res < 0) {
+    uart_puts("Error forking kernel process!\n\0");
     return 1;
   }
 
