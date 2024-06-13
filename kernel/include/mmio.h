@@ -20,4 +20,6 @@ extern void mmio_write_32(unsigned long, unsigned int);
 
 extern int get_current_exception_level();
 
+extern void mem_init_zero(unsigned long, unsigned long);
+
 #endif // !MMIO_H
