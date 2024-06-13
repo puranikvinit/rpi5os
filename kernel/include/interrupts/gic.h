@@ -59,9 +59,4 @@ void gic_init();
  */
 void enable_irq_line(unsigned int irq);
 
-/*! \brief Handle IRQs when the corresponding interrupt is raised.
- * This function (as of now) handles EL1h_IRQ and EL0_64_IRQ interrupts.
- */
-void handle_irq();
-
 #endif // !GIC_H

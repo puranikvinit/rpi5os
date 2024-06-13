@@ -1,8 +1,5 @@
 #include "interrupts/gic.h"
 #include "mmio.h"
-#include "peripherals/rp1.h"
-#include "peripherals/system_timer.h"
-#include "peripherals/uart.h"
 
 void gic_init() {
   // Disable all interrupt lines.
@@ -49,30 +46,4 @@ void enable_irq_line(unsigned int irq) {
   unsigned int register_offset = irq >> 5;
 
   mmio_write_32(GIC_D_ENABLE + 4 * register_offset, enable_bit);
-}
-
-void handle_irq() {
-  // Read the interrupt ID from the GIC CPU Interface interrupt ACKNOWLEDGE
-  // register.
-  unsigned int interrupt_spi = mmio_read_32(GIC_C_ACK);
-  unsigned int interrupt_id =
-      interrupt_spi & 0x3ff; // Extract the interrupt ID, ignoring the CPU ID.
-
-  // Trigger the respective interrupt handlers.
-  switch (interrupt_id) {
-  case SYSTEM_TIMER_IRQ_1:
-    mmio_write_32(GIC_C_EOI, interrupt_id);
-    handle_timer_irq();
-    break;
-
-  case PCIE_IRQ_4:
-    mmio_write_32(GIC_C_EOI, interrupt_id);
-    handle_uart_irq();
-    break;
-
-  default:
-    mmio_write_32(GIC_C_EOI, interrupt_id);
-    uart_puts("Unknown interrupt received!\n\0");
-    break;
-  }
 }
