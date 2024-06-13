@@ -57,7 +57,6 @@
 // [31]RW (0b1) - Execution state for EL1 is AArch64.
 //
 // ******************************************************************************
-
 #define HCR_RW (1 << 31)
 #define HCR_VALUE (HCR_RW)
 
@@ -72,5 +71,13 @@
 #define SPSR_MASK_ALL (7 << 6)
 #define SPSR_EL1h (5 << 0)
 #define SPSR_VALUE (SPSR_MASK_ALL | SPSR_EL1h)
+
+// ******************************************************************************
+//
+// CONSTANTS FOR ESR_EL1 (Exception Syndrome Register for EL1)
+//
+// ******************************************************************************
+#define ESR_EL1_EC_SHIFT 26
+#define ESR_EL1_EC_SVC_64B 0x15
 
 #endif // !SYSTEM_REGISTERS_H

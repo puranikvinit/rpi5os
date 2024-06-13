@@ -1,4 +1,4 @@
-#include "interrupts/system_registers.h"
+#include "system_registers.h"
 
 // Bootloader at the start of the kernel image
 .section ".text.boot"
