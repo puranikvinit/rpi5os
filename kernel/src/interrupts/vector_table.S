@@ -9,7 +9,6 @@ b \type
 
 .endm
 
-.globl interrupt_entry
 // Macro to define instruction sequence before the peocessor enters the interrupt handler
 .macro interrupt_entry el
 
@@ -47,7 +46,6 @@ stp x22, x23, [sp, #16*16]
 
 .endm
 
-.globl interrupt_exit
 // Macro to define instruction sequence after the processor exits the interrupt handler
 .macro interrupt_exit el
 
