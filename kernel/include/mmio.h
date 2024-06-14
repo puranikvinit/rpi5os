@@ -22,4 +22,8 @@ extern int get_current_exception_level();
 
 extern void mem_init_zero(unsigned long, unsigned long);
 
+extern void mem_copy(unsigned long, unsigned long, unsigned long);
+
+extern void set_pgd(unsigned long);
+
 #endif // !MMIO_H

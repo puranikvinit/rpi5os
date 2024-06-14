@@ -29,3 +29,19 @@ memcpy:
 	b.gt memcpy
 	ret
 
+.globl mem_copy
+mem_copy:
+	ldr x3, [x1], #8
+	str x3, [x0], #8
+	subs x2, x2, #8
+	b.gt memcpy
+	ret
+
+.globl set_pgd
+set_pgd:
+  msr ttbr0_el1, x0
+  tlbi vmalle1is
+  DSB ISH
+  isb
+  ret
+
