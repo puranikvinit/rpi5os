@@ -39,8 +39,15 @@ SYSCALLS_ASM_FILES = $(wildcard kernel/src/sys_calls/*.S)
 SYSCALLS_ASM_OBJ_FILES = $(SYSCALLS_ASM_FILES:.S=.o)
 
 
+TEST_C_FILES = $(wildcard test/src/*.c)
+TEST_C_OBJ_FILES = $(TEST_C_FILES:.c=.o)
+
+TEST_ASM_FILES = $(wildcard test/src/*.S)
+TEST_ASM_OBJ_FILES = $(TEST_ASM_FILES:.S=.o)
+
+
 LLVM_PATH = /opt/homebrew/opt/llvm/bin/
-CLANG_FLAGS = -Wall -O2 -ffreestanding -nostdinc -nostdlib -mcpu=cortex-a76+nosimd -Ikernel/include
+CLANG_FLAGS = -Wall -O2 -ffreestanding -nostdinc -nostdlib -mcpu=cortex-a76+nosimd -Ikernel/include -Itest/include
 
 
 # Default target
@@ -98,6 +105,14 @@ $(SYSCALLS_C_OBJ_FILES): %.o: %.c
 $(SYSCALLS_ASM_OBJ_FILES): %.o: %.S
 	$(LLVM_PATH)clang --target=aarch64-elf $(CLANG_FLAGS) -c $< -o $@
 
+# Compile all the TEST C files into object files
+$(TEST_C_OBJ_FILES): %.o: %.c
+	$(LLVM_PATH)clang --target=aarch64-elf $(CLANG_FLAGS) -c $< -o $@
+
+# Compile all the TEST ASSEMBLY files into object files
+$(TEST_ASM_OBJ_FILES): %.o: %.S
+	$(LLVM_PATH)clang --target=aarch64-elf $(CLANG_FLAGS) -c $< -o $@
+
 
 # Compile the mmio.S file into an object file
 mmio.o: kernel/src/mmio.S
@@ -109,8 +124,8 @@ kernel.o: kernel/kernel.c
 
 # 1. Link all the object files into a single ELF file
 # 2. Convert the ELF file into a binary file
-kernel8.img: boot.o mmio.o $(PERIPHERALS_C_OBJ_FILES) $(PERIPHERALS_ASM_OBJ_FILES) $(UTIL_C_OBJ_FILES) $(UTIL_ASM_OBJ_FILES) $(HANDLER_C_OBJ_FILES) $(HANDLER_ASM_OBJ_FILES) $(INTERRUPTS_C_OBJ_FILES) $(INTERRUPTS_ASM_OBJ_FILES) $(SCHEDULER_C_OBJ_FILES) $(SCHEDULER_ASM_OBJ_FILES) $(SYSCALLS_C_OBJ_FILES) $(SYSCALLS_ASM_OBJ_FILES) kernel.o
-	$(LLVM_PATH)ld.lld -m aarch64elf -nostdlib boot.o mmio.o $(PERIPHERALS_C_OBJ_FILES) $(PERIPHERALS_ASM_OBJ_FILES) $(UTIL_C_OBJ_FILES) $(UTIL_ASM_OBJ_FILES) $(HANDLER_C_OBJ_FILES) $(HANDLER_ASM_OBJ_FILES) $(INTERRUPTS_C_OBJ_FILES) $(INTERRUPTS_ASM_OBJ_FILES) $(SCHEDULER_C_OBJ_FILES) $(SCHEDULER_ASM_OBJ_FILES) $(SYSCALLS_C_OBJ_FILES) $(SYSCALLS_ASM_OBJ_FILES) kernel.o -T linker.ld -o kernel8.elf
+kernel8.img: boot.o mmio.o $(PERIPHERALS_C_OBJ_FILES) $(PERIPHERALS_ASM_OBJ_FILES) $(UTIL_C_OBJ_FILES) $(UTIL_ASM_OBJ_FILES) $(HANDLER_C_OBJ_FILES) $(HANDLER_ASM_OBJ_FILES) $(INTERRUPTS_C_OBJ_FILES) $(INTERRUPTS_ASM_OBJ_FILES) $(SCHEDULER_C_OBJ_FILES) $(SCHEDULER_ASM_OBJ_FILES) $(SYSCALLS_C_OBJ_FILES) $(SYSCALLS_ASM_OBJ_FILES) $(TEST_C_OBJ_FILES) $(TEST_ASM_OBJ_FILES) kernel.o
+	$(LLVM_PATH)ld.lld -m aarch64elf -nostdlib boot.o mmio.o $(PERIPHERALS_C_OBJ_FILES) $(PERIPHERALS_ASM_OBJ_FILES) $(UTIL_C_OBJ_FILES) $(UTIL_ASM_OBJ_FILES) $(HANDLER_C_OBJ_FILES) $(HANDLER_ASM_OBJ_FILES) $(INTERRUPTS_C_OBJ_FILES) $(INTERRUPTS_ASM_OBJ_FILES) $(SCHEDULER_C_OBJ_FILES) $(SCHEDULER_ASM_OBJ_FILES) $(SYSCALLS_C_OBJ_FILES) $(SYSCALLS_ASM_OBJ_FILES) $(TEST_C_OBJ_FILES) $(TEST_ASM_OBJ_FILES) kernel.o -T linker.ld -o kernel8.elf
 	$(LLVM_PATH)llvm-objcopy -O binary kernel8.elf kernel8.img
 
 # clean previous build and residual files
