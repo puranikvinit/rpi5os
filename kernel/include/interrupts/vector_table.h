@@ -42,5 +42,6 @@
 #define EL0_32_SERROR_EXCEPTION 15
 
 #define SYSCALL_ERROR 16
+#define DATA_ABORT_ERROR 17
 
 #endif // !VECTOR_TABLE_H

@@ -79,5 +79,6 @@
 // ******************************************************************************
 #define ESR_EL1_EC_SHIFT 26
 #define ESR_EL1_EC_SVC_64B 0x15
+#define ESR_EL0_EC_DATA_ABORT 0x24
 
 #endif // !SYSTEM_REGISTERS_H
