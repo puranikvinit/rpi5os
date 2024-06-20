@@ -47,7 +47,7 @@ TEST_ASM_OBJ_FILES = $(TEST_ASM_FILES:.S=.o)
 
 
 LLVM_PATH = /opt/homebrew/opt/llvm/bin/
-CLANG_FLAGS = -Wall -O2 -ffreestanding -nostdinc -nostdlib -mcpu=cortex-a76+nosimd -Ikernel/include -Itest/include
+CLANG_FLAGS = -Wall -g -O2 -ffreestanding -nostdinc -nostdlib -mcpu=cortex-a76+nosimd -Ikernel/include -Itest/include
 
 
 # Default target
