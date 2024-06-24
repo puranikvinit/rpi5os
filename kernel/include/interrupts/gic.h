@@ -8,9 +8,10 @@
 // Register offsets are extracted from the "CoreLink GIC-400 Generic Interrupt
 // Controller" Technical Reference Manual
 
+#include "mmu.h"
 enum {
   // Base address of the GIC-400 General Interrupt Controller
-  GIC_BASE = 0x107fff8000,
+  GIC_BASE = 0x107fff8000 + VA_START,
 
   // GIC-400 Distributor Register
   GIC_D_BASE =

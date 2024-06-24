@@ -3,9 +3,11 @@
 
 // Register addresses extracted from the Raspberry Pi 5 Devicetree
 
+#include "mmu.h"
 enum {
-  SOC_PERIPHERAL_BASE = 0x107c000000, // Base address of the peripherals which
-                                      // are on the SoC directly
+  SOC_PERIPHERAL_BASE =
+      0x107c000000 + VA_START, // Base address of the peripherals which
+                               // are on the SoC directly
 };
 
 #endif // !AP_H
