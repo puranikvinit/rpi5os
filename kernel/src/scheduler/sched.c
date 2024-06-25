@@ -1,11 +1,13 @@
 #include "scheduler/sched.h"
 #include "interrupts/vector_init.h"
-#include "scheduler/page_manager.h"
+#include "mmio.h"
+#include "peripherals/uart.h"
+#include "util/string.h"
 
 static task_struct_t init_task = INIT_TASK;
-task_struct_t *current_task = &(init_task);
+task_struct_t *current_task = 0;
 task_struct_t *task[MAX_TASKS] = {
-    &init_task,
+    0,
 };
 int number_of_tasks = 1;
 
@@ -13,12 +15,17 @@ void preempt_enable() { current_task->skip_preempt_count--; }
 
 void preempt_disable() { current_task->skip_preempt_count++; }
 
-void scheduler_init() {
+void schedule() {
   current_task->counter = 0;
-  schedule();
+  _schedule();
 }
 
-void schedule() {
+void scheduler_init() {
+  current_task = &init_task;
+  task[0] = current_task;
+}
+
+void _schedule() {
   preempt_disable();
 
   int c, next;
@@ -56,6 +63,7 @@ void switch_task(task_struct_t *next) {
   task_struct_t *prev = current_task;
   current_task = next;
 
+  set_pgd(current_task->mm.pgd_address);
   switch_context(prev, current_task);
 }
 
@@ -66,7 +74,7 @@ void timer_tick() {
 
   current_task->counter = 0;
   interrupts_enable();
-  schedule();
+  _schedule();
   interrupts_disable();
 }
 
@@ -81,14 +89,12 @@ void task_exit() {
 
   for (int i = 0; i < MAX_TASKS; i++) {
     if (task[i] == current_task) {
+      current_task->state = TASK_STOPPED;
       task[i]->state = TASK_STOPPED;
       break;
     }
   }
-  if (current_task->stack) {
-    free_page(current_task->stack);
-  }
 
   preempt_enable();
-  scheduler_init();
+  schedule();
 }
