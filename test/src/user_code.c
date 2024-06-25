@@ -1,27 +1,27 @@
 #include "user_code.h"
-#include "user_syscalls.h"
+#include "sys_calls/sys.h"
 
-void loop(char *str) {
-  char buf[2] = {""};
+void _loop(char *str) {
+  char buff[2] = "";
   while (1) {
-    for (int i = 0; i < 5; i++) {
-      buf[0] = str[i];
-      user_call_sys_write(buf);
+    for (int i = 0; i < 6; i++) {
+      buff[0] = str[i];
+      buff[1] = '\0';
+      call_sys_write(buff);
     }
   }
 }
 
 void user_process() {
-  user_call_sys_write("User process\n\r");
-  int pid = user_call_sys_fork();
+  call_sys_write("User Process\0");
+  int pid = call_sys_fork();
   if (pid < 0) {
-    user_call_sys_write("Error during fork\n\r");
-    user_call_sys_proc_exit();
+    call_sys_write("Fork failed\n\0");
     return;
   }
   if (pid == 0) {
-    loop("abcde");
+    _loop("abcde\n");
   } else {
-    loop("12345");
+    _loop("12345\n");
   }
 }

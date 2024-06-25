@@ -36,52 +36,11 @@ add sp, sp, #STACK_FRAME_SIZE
 eret
 .endm
 
-.globl call_sys_write
-call_sys_write:
-  mov w8, #SYS_WRITE
-  svc #0
-  ret
-
-.globl call_sys_fork
-call_sys_fork:
-  mov x10, x0
-  mov x11, x1
-  mov x12, x2
-
-  mov x0, x2
-  mov w8, #SYS_FORK
-  svc #0
-
-  cmp x0, #0
-  beq thread_start
-  ret
-
-.globl call_sys_malloc
-call_sys_malloc:
-  mov w8, #SYS_MALLOC
-  svc #0
-  ret
-
-.globl call_sys_proc_exit
-call_sys_proc_exit:
-  mov w8, #SYS_PROC_EXIT
-  svc #0
-  ret
-
 .globl return_from_syscall
 return_from_syscall:
   bl interrupts_disable
   str x0, [sp]
   interrupt_exit 0
-
-thread_start:
-  mov x29, #0
-
-  mov x0, x11
-  blr x10
-
-  mov x8, #SYS_PROC_EXIT
-  svc #0
 
 
 
