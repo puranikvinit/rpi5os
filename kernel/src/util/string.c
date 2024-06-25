@@ -43,6 +43,10 @@ void int_to_str(long num, char *buffer) {
     str_concat(buffer, "0\0");
     return;
   }
+
+  if (is_negative) {
+    str_concat(buffer, "-\0");
+  }
   while (num > 0) {
     int digit = num % 10;
     char c[2] = "";
@@ -52,7 +56,7 @@ void int_to_str(long num, char *buffer) {
     num /= 10;
   }
 
-  for (int i = 0; i < str_length(buffer) / 2; i++) {
+  for (int i = 0 + is_negative; i < str_length(buffer) / 2; i++) {
     char temp = buffer[i];
     buffer[i] = buffer[str_length(buffer) - 1 - i];
     buffer[str_length(buffer) - 1 - i] = temp;
