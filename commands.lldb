@@ -1,0 +1,25 @@
+b intr_init
+b stack_init
+
+b map_identity
+b smi
+b smi1
+b smi2
+
+b map_high
+b smh
+b smm1
+b smm2
+b smm3
+b smm4
+b smm7
+b smm5
+b smm6
+
+b kernel_main
+
+breakpoint enable 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
+
+gdb-remote 3333
+register write x1 0
+continue
