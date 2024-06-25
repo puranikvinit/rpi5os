@@ -1,14 +1,15 @@
 #include "scheduler/fork.h"
 #include "mmio.h"
+#include "mmu.h"
 #include "scheduler/page_manager.h"
 #include "scheduler/sched.h"
 
 int fork_process(unsigned long fork_flags, unsigned long function,
-                 unsigned long args, unsigned long stack_ptr) {
+                 unsigned long args) {
   preempt_disable();
 
   task_struct_t *new_task;
-  new_task = (task_struct_t *)allocate_free_page();
+  new_task = (task_struct_t *)allocate_kernel_page();
   if (!new_task) {
     // preempt_enable();
     return -1;
@@ -20,13 +21,12 @@ int fork_process(unsigned long fork_flags, unsigned long function,
 
   if (fork_flags & PF_KTHREAD) {
     new_task->cpu_context.x19 = function;
-    new_task->cpu_context.x20 = stack_ptr;
+    new_task->cpu_context.x20 = args;
   } else {
     proc_regs *regs_parent = get_ptr_to_regs(current_task);
     *regs_child = *regs_parent;
     regs_child->gpr[0] = 0;
-    regs_child->sp = stack_ptr + PAGE_SIZE;
-    new_task->stack = stack_ptr;
+    copy_virt_mem(new_task);
   }
 
   new_task->flags = fork_flags;
@@ -46,19 +46,21 @@ int fork_process(unsigned long fork_flags, unsigned long function,
   return number_of_tasks;
 }
 
-int move_to_user_mode(unsigned long function) {
+int move_to_user_mode(unsigned long start, unsigned long size,
+                      unsigned long function) {
   proc_regs *regs = get_ptr_to_regs(current_task);
   mem_init_zero((unsigned long)regs, sizeof(*regs));
 
   regs->pc = function;
   regs->proc_state = PSR_EL0t;
+  regs->sp = 2 * PAGE_SIZE;
 
-  unsigned long stack_ptr = allocate_free_page();
-  if (!stack_ptr)
+  unsigned long code_page = allocate_user_page(current_task, 0);
+  if (!code_page)
     return -1;
 
-  regs->sp = stack_ptr + PAGE_SIZE;
-  current_task->stack = stack_ptr;
+  mem_copy(code_page, start, size);
+  set_pgd(current_task->mm.pgd_address);
 
   return 0;
 }

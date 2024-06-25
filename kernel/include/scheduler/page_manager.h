@@ -1,18 +1,24 @@
 #ifndef PAGE_MANAGER_H
 #define PAGE_MANAGER_H
 
-#define PAGE_SIZE (1 << 12)
-#define SECTION_SIZE (1 << 21)
-
-#define LOW_MEMORY (2 * SECTION_SIZE)
-#define HIGH_MEMORY (512 * SECTION_SIZE)
-
-#define PAGING_MEMORY (HIGH_MEMORY - LOW_MEMORY)
-#define NUMBER_OF_PAGES (PAGING_MEMORY / PAGE_SIZE)
+#include "scheduler/sched.h"
 
 // Member APIs
 
 unsigned long allocate_free_page();
 void free_page(unsigned long page);
+
+unsigned long allocate_kernel_page();
+unsigned long allocate_user_page(task_struct_t *task, unsigned long virt_addr);
+
+void map_page(task_struct_t *task, unsigned long virt_addr, unsigned long page);
+unsigned long map_table(unsigned long *table, unsigned long shift,
+                        unsigned long virt_addr, int *status_code);
+void map_table_entry(unsigned long *pte, unsigned long virt_addr,
+                     unsigned long physical_addr);
+
+int copy_virt_mem(task_struct_t *dest);
+
+int mem_abort_handler(unsigned long addr, unsigned long esr_val);
 
 #endif // !PAGE_MANAGER_H

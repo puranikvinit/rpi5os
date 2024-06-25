@@ -1,9 +1,11 @@
 #ifndef SCHED_H
 #define SCHED_H
 
-#define THREAD_SIZE 4096
+#define THREAD_SIZE PAGE_SIZE
 
 #define MAX_TASKS 64
+
+#define MAX_PAGES_PER_PROCESS 16
 
 #define FIRST_TASK task[0]
 #define LAST_TASK task[MAX_TASKS - 1]
@@ -34,14 +36,27 @@ typedef struct {
 } cpu_context_t;
 
 typedef struct {
+  unsigned long physical_address;
+  unsigned long virtual_address;
+} user_page_t;
+
+typedef struct {
+  unsigned long pgd_address;
+  int user_pages_count;
+  user_page_t user_pages[MAX_PAGES_PER_PROCESS];
+  int kernel_pages_count;
+  unsigned long kernel_pages[MAX_PAGES_PER_PROCESS];
+} mm_struct_t;
+
+typedef struct {
   cpu_context_t cpu_context;
   task_state_t state;
   long counter;
   long priority;
   long skip_preempt_count;
 
-  unsigned long stack;
   unsigned long flags;
+  mm_struct_t mm;
 } task_struct_t;
 
 extern task_struct_t *current_task;
@@ -70,12 +85,19 @@ extern int number_of_tasks;
       .counter = 0,                                                            \
       .priority = 1,                                                           \
       .skip_preempt_count = 0,                                                 \
+      .flags = PF_KTHREAD,                                                     \
+      .mm = {.pgd_address = 0,                                                 \
+             .user_pages_count = 0,                                            \
+             .user_pages = {{0}},                                              \
+             .kernel_pages_count = 0,                                          \
+             .kernel_pages = {0}},                                             \
   }
 
 // Member APIs
 
 void scheduler_init();
 void schedule();
+void _schedule();
 
 void preempt_enable();
 void preempt_disable();

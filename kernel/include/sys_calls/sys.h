@@ -4,12 +4,12 @@
 // Member APIs
 
 void sys_write(char *text);
-int sys_fork(unsigned long stack);
+int sys_fork();
 unsigned long sys_malloc();
 void sys_proc_exit();
 
 extern void call_sys_write(char *);
-extern int call_sys_fork(unsigned long, unsigned long, unsigned long);
+extern int call_sys_fork();
 extern unsigned long call_sys_malloc();
 extern void call_sys_proc_exit();
 

@@ -23,9 +23,10 @@ typedef struct {
 // Member APIs
 
 int fork_process(unsigned long fork_flags, unsigned long function,
-                 unsigned long args, unsigned long stack_ptr);
+                 unsigned long args);
 
-int move_to_user_mode(unsigned long function);
+int move_to_user_mode(unsigned long start, unsigned long size,
+                      unsigned long function);
 
 proc_regs *get_ptr_to_regs(task_struct_t *task);
 
