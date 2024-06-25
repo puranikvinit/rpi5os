@@ -7,3 +7,6 @@ arm_64bit=1
 By default, the PCIe X4 interface is reset before loading the kernel so that the PCIe RC is in a clean state.
 Hence, to avoid the PCIe translations to the register addresses specified in the source from the AP, disable the reset.
 pciex4_reset=0
+
+Required for JTAG debugging, with OpenOCD and LLDB
+enable_jtag_gpio=1
