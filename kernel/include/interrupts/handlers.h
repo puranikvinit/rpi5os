@@ -6,6 +6,9 @@
  */
 void handle_irq();
 
+/*! \brief Handle Synchronous exceptions when the corresponding exception is
+ * raised. This function (as of now) handles EL1h_Synchronous exceptions.
+ */
 extern void handle_sync();
 
 #endif // !HANDLERS_H

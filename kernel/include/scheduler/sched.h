@@ -1,17 +1,25 @@
 #ifndef SCHED_H
 #define SCHED_H
 
+// Size of the stack for each task
 #define THREAD_SIZE PAGE_SIZE
 
+// Maximum number of tasks that can be created
 #define MAX_TASKS 64
 
+// Maximum number of pages that can be allocated for each task
 #define MAX_PAGES_PER_PROCESS 16
 
+// Task macros
 #define FIRST_TASK task[0]
 #define LAST_TASK task[MAX_TASKS - 1]
 
+// Task flags
 #define PF_KTHREAD 0x2
 
+/*!
+ * \brief Task states
+ */
 typedef enum {
   TASK_RUNNING,
   TASK_INTERRUPTIBLE,
@@ -19,6 +27,9 @@ typedef enum {
   TASK_STOPPED,
 } task_state_t;
 
+/*!
+ * \brief CPU context
+ */
 typedef struct {
   unsigned long x19;
   unsigned long x20;
@@ -35,11 +46,26 @@ typedef struct {
   unsigned long sp;
 } cpu_context_t;
 
+/*!
+ * \brief User page address
+ *
+ * \var `physical_address` Physical address of the page
+ * \var `virtual_address` Virtual address of the page
+ */
 typedef struct {
   unsigned long physical_address;
   unsigned long virtual_address;
 } user_page_t;
 
+/*!
+ * \brief Memory management structure
+ *
+ * \var `pgd_address` PGD translation table address for the current task
+ * \var `user_pages_count` Number of user pages
+ * \var `user_pages` User pages
+ * \var `kernel_pages_count` Number of kernel pages
+ * \var `kernel_pages` Kernel pages
+ */
 typedef struct {
   unsigned long pgd_address;
   int user_pages_count;
@@ -48,6 +74,17 @@ typedef struct {
   unsigned long kernel_pages[MAX_PAGES_PER_PROCESS];
 } mm_struct_t;
 
+/*!
+ * \brief Task structure, containing all the information about a task
+ *
+ * \var `cpu_context` CPU context
+ * \var `state` Task state
+ * \var `counter` Task counter
+ * \var `priority` Task priority
+ * \var `skip_preempt_count` Number of times a task can skip preemption
+ * \var `flags` Task flags
+ * \var `mm` Memory management structure
+ */
 typedef struct {
   cpu_context_t cpu_context;
   task_state_t state;
@@ -59,10 +96,13 @@ typedef struct {
   mm_struct_t mm;
 } task_struct_t;
 
+// Global variables, for task management
 extern task_struct_t *current_task;
 extern task_struct_t *task[MAX_TASKS];
 extern int number_of_tasks;
 
+// Initial task (even the first task created by the kernel is forked from this
+// init task)
 #define INIT_TASK                                                              \
   {                                                                            \
       .cpu_context =                                                           \
@@ -95,19 +135,60 @@ extern int number_of_tasks;
 
 // Member APIs
 
+/*!
+ * \brief Initialize the scheduler
+ */
 void scheduler_init();
+
+/*! \brief prepare the scheduler */
 void schedule();
+
+/*!
+ * \brief Schedule the next task in the task queue
+ * based on the basic scheduling algorithm used in the initial release of the
+ * Linux Kernel
+ */
 void _schedule();
 
+/*!
+ * \brief Enable preemption of the current task
+ */
 void preempt_enable();
+
+/*!
+ * \brief Disable preemption of the current task
+ */
 void preempt_disable();
 
+/*!
+ * \brief Switch the current task with the next task
+ *
+ * \param next Next task that has to be scheduled by the scheduler.
+ */
 void switch_task(task_struct_t *next);
+
+/*!
+ * \brief Switch the context of the current task with the next task
+ *
+ * \param prev Previous task
+ * \param next Next task
+ */
 extern void switch_context(task_struct_t *prev, task_struct_t *next);
 
+/*!
+ * \brief Prepare the kernel, and call the scheduler when the system timer
+ * raises an interrupt
+ */
 void timer_tick();
 
+/*!
+ * \brief Prepare the kernel and the CPU to execute the upcoming task scheduled.
+ */
 void task_init();
+
+/*!
+ * \brief Gracefully exit the current task
+ */
 void task_exit();
 
 #endif // !SCHED_H

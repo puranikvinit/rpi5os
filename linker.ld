@@ -3,7 +3,7 @@ SECTIONS
     . = 0x80000; /* Start address of the kernel image */
 
     .text : { 
-        KEEP(*(.text.boot)) 
+        KEEP(*(.text.boot)) /* Keep the boot section in the final output file */
 
         kernel/src/*(.text .text.* .gnu.linkonce.t*)
         kernel/src/interrupts/*(.text .text.* .gnu.linkonce.t*)
@@ -13,6 +13,7 @@ SECTIONS
         kernel/src/sys_calls/*(.text .text.* .gnu.linkonce.t*)
         kernel/src/util/*(.text .text.* .gnu.linkonce.t*)
     }
+
     .rodata : {
         kernel/src/*(.rodata .rodata.* .gnu.linkonce.r*)
         kernel/src/interrupts/*(.rodata .rodata.* .gnu.linkonce.r*)
@@ -23,7 +24,7 @@ SECTIONS
         kernel/src/util/*(.rodata .rodata.* .gnu.linkonce.r*)
     }
 
-        /* PROVIDE -> for variables which are referenced but not initialized in the section */
+    /* PROVIDE -> for variables which are referenced but not initialized in the section */
     PROVIDE(_data = .); /* Initialize data start address to current location pointer */
     .data : { 
         kernel/src/*(.data .data.* .gnu.linkonce.d*)
@@ -51,14 +52,19 @@ SECTIONS
         __bss_end = .; /* End address of the BSS section */
     }
 
+    /* Page directory for the identity mapped memory (first 16 MiB); lower half virtual address space*/
+    /* NOTE: The page directory is 4 KiB in size, with each entry being 8 bytes long */
+    /* The table addresses must be aligned to 4 KiB boundaries */
     . = ALIGN(0x1000);
     id_pg_dir = .;
     .data.id_pg_dir : { . += (3 * (1 << 12)); }
 
+    /* Page directory for the high memory (16 MiB to 4 GiB) and the SoC and RP1 peripheral address space; higher half virtual address space */
     . = ALIGN(0x1000);
     high_pg_dir = .;
     .data.high_pg_dir : { . += (8 * (1 << 12)); }
 
+    /* Userspace code sections */
     . = ALIGN(0x1000);
     __user_begin = .;
     .text.user : { test/src*(.text .text.*) } 
@@ -76,5 +82,6 @@ SECTIONS
 
 /* .gnu.linkonce.d -> used by the GNU linker for certain optimizations
 *  for example, merge identical constants across various files into a single section to save space and access times */
+
 __bss_size = (__bss_end - __bss_start)>>3; /* Size of the BSS section */
 

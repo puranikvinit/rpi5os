@@ -34,8 +34,15 @@ int str_length(const char *s);
  *  \param `dest` destination string*/
 void str_concat(char *src, char *dest);
 
+/*! \brief Remove the trailing spaces from the input string
+ *
+ *  \param `str` string from which trailing spaces have to be removed*/
 void str_remove_trailing_spaces(char *str);
 
+/*! \brief Empty the input string
+ *
+ * \param `str` string to be emptied
+ */
 void str_empty(char *str);
 
 #endif // !STRING_H

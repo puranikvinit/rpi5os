@@ -12,7 +12,7 @@ _start:
     and x7, x7, #7 // Last 3 bits of the identifier extracted. Indicates CPU ID.
     cbz x7, intr_init // Proceed if on primary core, else wait for the primary core to initialize.
     
-    // The default stub for the Raspberry Pi 5 looks for the first instruction at x80000, 
+    // The default stub for the Raspberry Pi 5 looks for the first instruction at 0x80000, 
     // and runs it on the primary core of the processor (generally core 0), and parks all 
     // the remaining cores. If the address of a function is written onto the register at 
     // which the respective core expects it, the core is then woken up from sleep to 
@@ -57,38 +57,44 @@ bss_loop: cbz x2, stack_init // Skip initialization of BSS variables if the size
           sub x2, x2, #1
           cbnz x2, bss_loop // Iterate for all variables of the BSS section
 
-stack_init: adrp x0, _start
+stack_init: adrp x0, _start // Assign the top of the stack (0x80000) to the stack pointer
             mov sp, x0
 
-            bl map_identity
-            bl map_high
+            bl map_identity // Fill the identity mapped translation tables
+            bl map_high // Fill the high mapped translation tables
 
-            adrp x0, id_pg_dir
+            adrp x0, id_pg_dir // Load the address of the identity mapped translation tables, assign it to ttbr0_el1
             msr ttbr0_el1, x0
             
-            adrp x0, high_pg_dir
+            adrp x0, high_pg_dir // Load the address of the high mapped translation tables, assign it to ttbr1_el1
             msr ttbr1_el1, x0
 
+            // Invalidate TLB cache, use data synchronization barrier, and instruction synchronization barrier and flush the pipeline
             tlbi vmalle1
             dsb ish
             isb
+
+            // Enable the MMU unit
             mrs x0, sctlr_el1
             ldr x1, =SCTLR_MMU_ENABLED
             orr x0, x0, x1
             msr sctlr_el1, x0
             
+            // Clear the data cache, use data synchronization barrier, and instruction synchronization barrier, and again flush the pipeline to prevent incorrect data access
             isb
             dc ivac, xzr
             dsb ish
             isb
 
+            // Adjust the stack pointer to the higher half of the memory
             ldr x0, =VA_START
             add sp, sp, x0
 
+            // Adjust the program counter to the higher half of the memory by branching to the instruction in the higher half
             adr x1, kernel_main
             add x1, x1, x0
 
-            mov x0, #0 // Pass core ID as an argument to the `kernel_main()` routine of the kernel
+            mov x0, x7 // Pass core ID as an argument to the `kernel_main()` routine of the kernel
             blr x1 // Jump to the `kernel_main()` routine of the kernel
 
             b core_hang // If the `kernel_main()` routine of the kernel returns, loop indefinitely
@@ -106,18 +112,19 @@ str \t2, [\table, \t1, lsl #3] // Store the table descriptor entry in the table 
 
 .macro create_block_map, table, va_start, va_end, pa_start, flags, t1
 lsr \va_start, \va_start, #SECTION_SHIFT // Shift the virtual address to the right by the section shift value
-and \va_start, \va_start, #ENTRIES_PER_TABLE - 1
+and \va_start, \va_start, #ENTRIES_PER_TABLE - 1 // Extract the start index of the entry in the table, by masking the bits to the left of the index.
 
 lsr \va_end, \va_end, #SECTION_SHIFT
 sub \va_end, \va_end, #1
-and \va_end, \va_end, #ENTRIES_PER_TABLE - 1
+and \va_end, \va_end, #ENTRIES_PER_TABLE - 1 // Extract the end index of the entry in the table, by masking the bits to the left of the index.
 
 lsr \pa_start, \pa_start, #SECTION_SHIFT
 lsl \pa_start, \pa_start, #SECTION_SHIFT
 
 mov \t1, \flags
-orr \pa_start, \pa_start, \t1
+orr \pa_start, \pa_start, \t1 // Set the flags for the block mapping
 
+// Create the block mapping for the virtual address range
 9999: str \pa_start, [\table, \va_start, lsl #3]
       add \va_start, \va_start, #1
       add \pa_start, \pa_start, #SECTION_SIZE
@@ -129,20 +136,24 @@ orr \pa_start, \pa_start, \t1
 map_identity:
   mov x29, x30
 
+  // Load the address of the identity mapping translation tables, and clear the tables
   adrp x0, id_pg_dir
   mov x1, #ID_MAP_TABLE_SIZE
   bl mem_init_zero
 
+  // Fill PGD translation table
 smi:  adrp x0, id_pg_dir
   add x1, x0, #PAGE_SIZE
   eor x4, x4, x4
   create_table_entry x0, x1, x4, PGD_SHIFT, x2, x3
 
+  // Fill PUD translation table
   add x0, x0, #PAGE_SIZE
   add x1, x1, #PAGE_SIZE
   eor x4, x4, x4
   create_table_entry x0, x1, x4, PUD_SHIFT, x2, x3
 
+  // Fill PMD translation table for the first 16MiB of physical memory
 smi1:  mov x0, x1
   eor x2, x2, x2
   ldr x3, =ID_MAP_SIZE
@@ -157,10 +168,12 @@ smi2:  mov x30, x29
 map_high:
   mov x29, x30
 
+  // Load the address of the high mapping translation tables, and clear the tables
   adrp x0, high_pg_dir
   mov x1, #HIGH_MAP_TABLE_SIZE
   bl mem_init_zero
 
+  // Fill PGD translation table
 smh:  adrp x0, high_pg_dir
   add x1, x0, #PAGE_SIZE
 
@@ -170,6 +183,7 @@ smh:  adrp x0, high_pg_dir
   add x0, x0, #PAGE_SIZE
   add x1, x1, #PAGE_SIZE
 
+  // Fill PUD translation table
   ldr x4, =VA_START
   ldr x5, =PUD_ENTRY_MAP_SIZE
   create_table_entry x0, x1, x4, PUD_SHIFT, x2, x3
@@ -224,6 +238,7 @@ smh:  adrp x0, high_pg_dir
   ldr x26, =PHYSICAL_SOC_START
   ldr x27, =PHYSICAL_DEVICE_START
 
+  // Fill all the PMD translation tables for the high memory region, as per the memory layout defined in the mmu.h file
 smm1:  add x0, x0, #PAGE_SIZE
   mov x2, x10
   mov x3, x11

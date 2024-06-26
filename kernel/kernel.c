@@ -1,12 +1,12 @@
 #include "interrupts/gic.h"
 #include "interrupts/vector_init.h"
+#include "mmio.h"
 #include "peripherals/system_timer.h"
 #include "peripherals/uart.h"
 #include "scheduler/fork.h"
 #include "scheduler/sched.h"
 #include "user_code.h"
-
-long semaphore = 0;
+#include "util/string.h"
 
 void kernel_process() {
   uart_puts("Kernel Process\n\0");
@@ -33,11 +33,11 @@ int kernel_main(unsigned int core_id) {
   uart_putc(core_id + '0');
   uart_putc('\n');
 
-  // char buff[5] = "";
-  // int_to_str(get_current_exception_level(), buff);
-  // uart_puts("Current Exception Level: \0");
-  // uart_puts(buff);
-  // uart_putc('\n');
+  char buff[5] = "";
+  int_to_str(get_current_exception_level(), buff);
+  uart_puts("Current Exception Level: \0");
+  uart_puts(buff);
+  uart_putc('\n');
 
   vector_table_init();
   uart_puts("Vector Table Initialized!\n\0");
