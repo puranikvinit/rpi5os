@@ -2,6 +2,22 @@
 
 rpi5os is a minimalistic kernel written for the Raspberry Pi 5. It is written in C and ARMv8 assembly. This was written mainly to summarize my understanding of the ARM architecture and the Raspberry Pi ecosystem, especially that of the Pi 5. This is not a full-fledged operating system, but a simple kernel that can be used to understand the basics of operating systems.
 
+# Table of Contents
+
+- [Features](#features)
+- [The Raspberry Pi 5](#the-raspberry-pi-5)
+- [The RP1 Southbridge](#the-rp1-southbridge)
+- [The GPIO Header](#the-gpio-header)
+- [Using the Kernel](#using-the-kernel)
+  - [Pre-requisites](#pre-requisites)
+  - [With prebuilt kernel image](#with-prebuilt-kernel-image)
+  - [Building the kernel from source](#building-the-kernel-from-source)
+  - [Using the UART interface to see messages spit out by the kernel](#using-the-uart-interface-to-see-messages-spit-out-by-the-kernel)
+  - [Hardware Debugging](#hardware-debugging)
+- [The MMU](#the-mmu)
+- [Caveats and Notes](#caveats-and-notes)
+- [Future Work](#future-work)
+
 # Features
 
 - Uses **ARM PrimeCell PL011** UART (revision r1p5) for serial communication, with a baud rate of **9600 bps**. ([docs](https://developer.arm.com/documentation/ddi0183/g))
