@@ -81,4 +81,21 @@
 #define ESR_EL1_EC_SVC_64B 0x15
 #define ESR_EL0_EC_DATA_ABORT 0x24
 
+// ******************************************************************************
+//
+// PREDEFINED CONFIGS FOR CPACR_EL1 (Architectural Feature Access Control
+// Register)
+//
+// [21:20]FPEN (0b11) - Traps execution at EL0 and EL1, of instructions that
+// access the advanced SIMD and floating-point registers.
+// 0b00 -> Traps at both EL0 and EL1.
+// 0b01 -> Traps at EL0, not at EL1.
+// 0b10 -> Traps at both EL0 and EL1.
+// 0b11 -> Traps disabled for both EL0 and EL1.
+//
+// ******************************************************************************
+
+#define CPACR_FPEN (3 << 20)
+#define CPACR_VALUE (CPACR_FPEN)
+
 #endif // !SYSTEM_REGISTERS_H

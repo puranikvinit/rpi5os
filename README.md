@@ -62,13 +62,13 @@ The RP1 microcontroller has a **32-bit** address space, which translates to a **
 The PCIe host bus is connected to the BCM2712 AP mapped to a start address of **0x1F00000000**.
 Hence to access the RP1 peripherals address space from the BCM2712 AP address space, we will have to add the above mentioned offsets to the base address.
 
-> NOTE: By default, the PCIe X4 interface is reset before loading the kernel so that the PCIe RC is in a clean state. For bare metal/bringup you can add `pciex4_reset=0` to `config.txt` because writing a bare metal PCIe RC driver probably isn't everyone's cup of tea.
+> By default, the PCIe X4 interface is reset before loading the kernel so that the PCIe RC is in a clean state. For bare metal/bringup you can add `pciex4_reset=0` to `config.txt` because writing a bare metal PCIe RC driver probably isn't everyone's cup of tea.
 
 # The GPIO Header
 
 This [repo](https://github.com/Felipegalind0/RPI5.pinout) provides a detailed explanation of the GPIO header on the Raspberry Pi 5.
 
-TLDR: The ARM PrimeCell Pl011 UART is on GPIO pins 14 and 15 of alternate function 4.
+TLDR: The ARM PrimeCell Pl011 UART is on GPIO pins 14 and 15 of alternate function **a4**.
 The corresponding header pin numbers are as follows:
 
 PIN_2 - **+5V**\
@@ -112,10 +112,10 @@ The 5V supply isn't required if the Pi is powered via the USB-C port.
   - The color coding of the TTL serial cable wires in the image is as follows:
     - Red - **+5V power supply** (not required in our case, as mentioned above)
     - Black - **GND**
-    - White - **RX** (Receive data from the Pi from the USB interface)
+    - White - **RX** (Receive data from the Pi to the USB interface)
     - Green - **TX** (Transmit data to the Pi from the USB interface)
 
-The RX and TX wires should be connected to UART0_TX and UART0_RX pins on the GPIO header respectively.
+The **RX** and **TX** wires should be connected to **UART0_TX** and **UART0_RX** pins on the GPIO header respectively.
 
 - Open the terminal emulator and connect to the serial port, while setting the options as follows:
 
@@ -131,9 +131,9 @@ The RX and TX wires should be connected to UART0_TX and UART0_RX pins on the GPI
 ## Hardware Debugging
 
 Hardware debugging on the Raspberry Pi 5 is only supported via the dedicated UART port (the one which is located in between the two HDMI ports).
-The complete steps to setup the environment for hardware dubugging can be found in this [article](https://macoy.me/blog/programming/RaspberryPi5Debugging)
+The complete steps to setup the environment for hardware dubugging can be found in this [article](https://macoy.me/blog/programming/RaspberryPi5Debugging).
 
-The required configuration files for OpenOCD and LLDB commands (yes I have used LLDB for debugging as GDB multiarch debugging isn't supported on macOS with Apple Silicon chips) can be found in the source itself.
+The required configuration files for OpenOCD and LLDB commands (yes, I have used LLDB for debugging as GDB-multiarch debugging isn't supported on macOS with Apple Silicon chips) can be found in the source itself.
 
 Also, see the `changes-to-config.txt` for the required parameter to be set before booting the kernel.
 
@@ -148,7 +148,8 @@ Also, see the `changes-to-config.txt` for the required parameter to be set befor
 - The RP1 peripherals documentation linked above mentions the the frequency of `clk_uart` (which is an independent UART baud clock used by the PL011 UART, and is a direct derivative of the quartz crystal oscillator on the board), is **48MHz**, but on reading the respective register values on a working UART implementation and reverse engineering, it was found that the frequency is **50MHz**. This is the frequency used in the kernel for baud rate calculations.
 - All the base addresses of the peripherals used by the kernel are obtained from the devicetree source of the BCM2712 SoC. There is no concrete documentation available for the AP at the time of writing this README.
 - This code is not backwards compatible with the previous generations of the Raspberry Pi, because of the obvious variations in the SoC and the peripheral controllers.
-- A wierd issue was observed when enabling interrupt in the EL0_64 SVC exception handler, which caused the PC (program counter) register to point to a misaligned and invalid memory address, hence, as of now, the interrupts are not enabled while servicing EL0_64 SVC exceptions. The cause of the issue is unknown, and will be fixed once more details will be known.
+- A wierd issue was observed when enabling interrupts in the `EL0_64_SVC` exception handler, which caused the `pc` (program counter) to point to a misaligned and invalid memory address, hence, as of now, the interrupts are not enabled while servicing `EL0_64_SVC` exceptions. The cause of the issue is unknown, and will be fixed once more details will be known.
+- An issue was observed where declaring long strings raised an `EL1H_SYNC` exception; it was raised due to the usage of a **Qx** register, which is a SIMD / FP register. Not setting `CPACR_EL1.FPEN` register was causing the exceptions to be raised. Hence, set `CPACR_EL1.FPEN` bits to **0b11** to disable these traps.
 
 # Future Work
 

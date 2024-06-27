@@ -43,6 +43,9 @@ intr_init:  ldr x0, =SCTLR_VALUE_MMU_DISABLED
             ldr x0, =MAIR_VALUE
             msr mair_el1, x0
 
+            ldr x0, =CPACR_VALUE
+            msr cpacr_el1, x0
+
             adr x0, bss_init
             msr elr_el2, x0
 
