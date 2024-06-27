@@ -132,9 +132,11 @@ Also, see the `changes-to-config.txt` for the required parameter to be set befor
 - The RP1 peripherals documentation linked above mentions the the frequency of `clk_uart` (which is an independent UART baud clock used by the PL011 UART, and is a direct derivative of the quartz crystal oscillator on the board), is **48MHz**, but on reading the respective register values on a working UART implementation and reverse engineering, it was found that the frequency is **50MHz**. This is the frequency used in the kernel for baud rate calculations.
 - All the base addresses of the peripherals used by the kernel are obtained from the devicetree source of the BCM2712 SoC. There is no concrete documentation available for the AP at the time of writing this README.
 - This code is not backwards compatible with the previous generations of the Raspberry Pi, because of the obvious variations in the SoC and the peripheral controllers.
+- A wierd issue was observed when enabling interrupt in the EL0_64 SVC exception handler, which caused the PC (program counter) register to point to a misaligned and invalid memory address, hence, as of now, the interrupts are not enabled while servicing EL0_64 SVC exceptions. The cause of the issue is unknown, and will be fixed once more details will be known.
 
 # Future Work
 
+- [ ] Implement a logger for the kernel, to get detailed dumps of the processor and kernel state at important points in the code.
 - [ ] Unpark the other cores of the BCM2712 AP, and have a working multi-core system.
 - [ ] Implement a simple filesystem.
 - [ ] Implement a simple shell for user interactions.
