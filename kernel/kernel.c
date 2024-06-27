@@ -34,7 +34,7 @@ int kernel_main(unsigned int core_id) {
   uart_putc('\n');
 
   char buff[5] = "";
-  int_to_str(get_current_exception_level(), buff);
+  int_to_str(get_current_exception_level(), buff, 10);
   uart_puts("Current Exception Level: \0");
   uart_puts(buff);
   uart_putc('\n');

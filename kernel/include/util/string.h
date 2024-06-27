@@ -17,7 +17,7 @@ int str_to_int(char *s);
  * enough space)
  *
  *  \return corresponding string value*/
-void int_to_str(long num, char *buffer);
+void int_to_str(long num, char *buffer, int base);
 
 /*! \brief Calculate the length of the input string
  *

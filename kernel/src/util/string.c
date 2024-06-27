@@ -1,4 +1,5 @@
 #include "util/string.h"
+#include "peripherals/uart.h"
 
 int str_length(const char *s) {
   register const char *str;
@@ -35,28 +36,43 @@ int str_to_int(char *s) {
   return is_negative ? (-1 * res) : res;
 }
 
-void int_to_str(long num, char *buffer) {
-  int is_negative = (num < 0);
-  num = is_negative ? (num * -1) : num;
-
+void int_to_str(long num, char *buffer, int base) {
   if (num == 0) {
     str_concat(buffer, "0\0");
     return;
   }
 
-  if (is_negative) {
-    str_concat(buffer, "-\0");
-  }
-  while (num > 0) {
-    int digit = num % 10;
-    char c[2] = "";
-    c[0] = (char)(digit + 48);
-    c[1] = '\0';
-    str_concat(buffer, c);
-    num /= 10;
+  int is_negative = 0;
+  if (num < 0 && base == 10) {
+    num *= -1;
+    is_negative = 1;
   }
 
-  for (int i = 0 + is_negative; i < str_length(buffer) / 2; i++) {
+  while (num != 0) {
+    int digit = num % base;
+    char c[2] = "";
+    c[0] = (char)((digit < 10) ? (digit + 48) : (digit - 10 + 'a'));
+    c[1] = '\0';
+    str_concat(buffer, c);
+    num = num / base;
+  }
+
+  switch (base) {
+  case 2:
+    str_concat(buffer, "b0\0");
+    break;
+
+  case 10:
+    if (is_negative)
+      str_concat(buffer, "-\0");
+    break;
+
+  case 16:
+    str_concat(buffer, "x0\0");
+    break;
+  }
+
+  for (int i = 0; i < str_length(buffer) / 2; i++) {
     char temp = buffer[i];
     buffer[i] = buffer[str_length(buffer) - 1 - i];
     buffer[str_length(buffer) - 1 - i] = temp;
