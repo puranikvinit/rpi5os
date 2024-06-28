@@ -6,10 +6,16 @@ char *log_levels[] = {
     "INFO: \0", "DEBUG: \0", "WARN: \0", "ERROR: \0", "PANIC: \0",
 };
 
+char *log_level_colors[] = {
+    "\033[0;32m\0", "\033[0;36m\0", "\033[0;33m\0",
+    "\033[0;35m\0", "\033[0;31m\0",
+};
+
 void printk(log_level lvl, char *fmt, ...) {
   va_list va;
   va_start(va, fmt);
 
+  uart_puts(log_level_colors[lvl] + VA_START);
   uart_puts(log_levels[lvl] + VA_START);
 
   for (const char *f = fmt; *f != '\0'; f++) {
@@ -56,6 +62,8 @@ void printk(log_level lvl, char *fmt, ...) {
     }
     }
   }
+
+  uart_puts("\033[m\0");
   uart_putc('\n');
 
   va_end(va);
