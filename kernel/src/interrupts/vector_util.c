@@ -1,23 +1,10 @@
-#include "peripherals/uart.h"
-#include "util/string.h"
+#include "types.h"
+#include "util/printk.h"
 
-void display_message(int interrupt_type, unsigned long elr, unsigned long esr) {
-  uart_puts("Interrupt Type: \0");
-  char buff[3] = "";
-  int_to_str(interrupt_type, buff,
-             10); // TODO: Show name rather than number of the interrupt
-  uart_puts(buff);
-  uart_puts("\n\0");
+void display_message(int interrupt_type, u64 elr, unsigned long esr) {
+  printk(PANIC, "INTERRUPT HANDLER NOT FOUND\0");
 
-  char buff2[20] = "";
-  uart_puts("ELR: \0");
-  int_to_str(elr, buff2, 16);
-  uart_puts(buff2);
-  uart_puts("\n\0");
-
-  char buff3[20] = "";
-  uart_puts("ESR: \0");
-  int_to_str(esr, buff3, 2);
-  uart_puts(buff3);
-  uart_puts("\n\0");
+  printk(INFO, "interrupt type: %d\0", interrupt_type);
+  printk(INFO, "ELR: %x\0", elr);
+  printk(INFO, "ESR: %b\0", esr);
 }

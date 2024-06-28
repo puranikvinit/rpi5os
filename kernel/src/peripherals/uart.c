@@ -1,6 +1,7 @@
 #include "peripherals/uart.h"
 #include "mmio.h"
 #include "peripherals/gpio.h"
+#include "util/printk.h"
 
 uart_baud_rate_t _calculate_baud_rate(long baud_rate) {
   double baud_rate_divisor = (double)UART_CLOCK_FREQ / (0x10 * baud_rate);
@@ -99,7 +100,7 @@ void uart_puts(const char *s) {
 
 void handle_uart_irq() {
   mmio_write_32(UART0_ICR, 1 << 4); // Clear the RX interrupt
-  uart_puts("UART Interrupt Received!\n\0");
+  printk(INFO, "uart interrupt received\0");
 
   uart_putc(
       uart_getc()); // Echo the received character and clear the RX FIFO queue.

@@ -1,8 +1,6 @@
 #include "scheduler/sched.h"
 #include "interrupts/vector_init.h"
 #include "mmio.h"
-#include "peripherals/uart.h"
-#include "util/string.h"
 
 static task_struct_t init_task = INIT_TASK;
 task_struct_t *current_task = 0;

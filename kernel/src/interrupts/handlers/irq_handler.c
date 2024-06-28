@@ -3,6 +3,7 @@
 #include "peripherals/rp1.h"
 #include "peripherals/system_timer.h"
 #include "peripherals/uart.h"
+#include "util/printk.h"
 
 void handle_irq() {
   // Read the interrupt ID from the GIC CPU Interface interrupt ACKNOWLEDGE
@@ -25,7 +26,7 @@ void handle_irq() {
 
   default:
     mmio_write_32(GIC_C_EOI, interrupt_id);
-    uart_puts("Unknown interrupt received!\n\0");
+    printk(ERROR, "unknown interrupt received\0");
     break;
   }
 }

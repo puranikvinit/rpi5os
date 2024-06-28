@@ -1,10 +1,8 @@
 #include "sys_calls/sys.h"
-#include "mmu.h"
 #include "peripherals/uart.h"
 #include "scheduler/fork.h"
 #include "scheduler/page_manager.h"
 #include "scheduler/sched.h"
-#include "sys_calls/sys_wrappers.h"
 
 void sys_write(char *text) { uart_puts(text); }
 

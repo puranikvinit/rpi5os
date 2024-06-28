@@ -3,6 +3,7 @@
 #include "mmu.h"
 #include "peripherals/uart.h"
 #include "scheduler/sched.h"
+#include "util/printk.h"
 
 static unsigned short page_map[NUMBER_OF_PAGES] = {
     0,
@@ -119,17 +120,21 @@ static int ind = 1;
 int mem_abort_handler(unsigned long addr, unsigned long esr_val) {
   unsigned long dfs = esr_val & 0b111111;
   if ((dfs & 0b111100) == 0b100) {
-    uart_puts("Hey Sexy!\n\0");
+    printk(ERROR, "data abort exception\0");
     unsigned long page = allocate_free_page();
     if (!page)
       return -1;
 
     map_page(current_task, addr & MM_PAGE_TABLE_ADDR_MASK, page);
     ind++;
-    if (ind > 2)
+    if (ind > 2) {
+      printk(PANIC, "UNABLE TO HANDLE PAGE FAULT\0");
       return -1;
+    }
 
+    printk(INFO, "page fault handled\0");
     return 0;
   }
+  printk(PANIC, "UNABLE TO HANDLE PAGE FAULT\0");
   return -1;
 }
