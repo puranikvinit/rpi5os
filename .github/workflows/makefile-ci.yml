@@ -2,7 +2,7 @@ name: Makefile CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "ci-testing" ]
   pull_request:
     branches: [ "main" ]
 
@@ -18,6 +18,13 @@ jobs:
       with:
         version: "10.0"
         directory: /opt/homebrew/opt/llvm
+
+    - name: Place header files in expected directory
+      run: |
+        mkdir -p /opt/homebrew/Cellar/llvm/18.1.6/lib/clang/18/include
+        cp /opt/homebrew/opt/llvm/lib/clang/10.0.1/include/stdarg.h /opt/homebrew/Cellar/llvm/18.1.6/lib/clang/18/include/
+        cp /opt/homebrew/opt/llvm/lib/clang/10.0.1/include/stdint.h /opt/homebrew/Cellar/llvm/18.1.6/lib/clang/18/include/
+            
 
     - uses: actions/checkout@v4
 
