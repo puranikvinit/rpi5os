@@ -22,7 +22,7 @@ jobs:
     - name: Place header files in expected directory
       run: |
         mkdir -p /opt/homebrew/Cellar
-        ls /opt/homebrew/opt/llvm/lib/clang/10.0.1
+        cp -r /opt/homebrew/opt/llvm/lib/clang/10.0.1/include /opt/homebrew/Cellar/llvm/18.1.6/lib/clang/18/include
             
 
     - uses: actions/checkout@v4
