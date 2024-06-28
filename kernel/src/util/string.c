@@ -1,5 +1,4 @@
 #include "util/string.h"
-#include "peripherals/uart.h"
 
 int str_length(const char *s) {
   register const char *str;
@@ -36,7 +35,7 @@ int str_to_int(char *s) {
   return is_negative ? (-1 * res) : res;
 }
 
-void int_to_str(long num, char *buffer, int base) {
+void int_to_str(u64 num, char *buffer, int base) {
   if (num == 0) {
     str_concat(buffer, "0\0");
     return;

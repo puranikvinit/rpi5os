@@ -1,6 +1,8 @@
 #ifndef STRING_H
 #define STRING_H
 
+#include "types.h"
+
 // Member APIs
 
 /*! \brief Convert an input string into corresponding integer value
@@ -17,7 +19,7 @@ int str_to_int(char *s);
  * enough space)
  *
  *  \return corresponding string value*/
-void int_to_str(long num, char *buffer, int base);
+void int_to_str(u64 num, char *buffer, int base);
 
 /*! \brief Calculate the length of the input string
  *
