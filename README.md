@@ -153,7 +153,7 @@ Also, see the `changes-to-config.txt` for the required parameter to be set befor
 
 # Future Work
 
-- [ ] Implement a logger for the kernel, to get detailed dumps of the processor and kernel state at important points in the code.
+- [x] Implement a logger for the kernel, to get detailed dumps of the processor and kernel state at important points in the code.
 - [ ] Unpark the other cores of the BCM2712 AP, and have a working multi-core system.
 - [ ] Implement a simple filesystem.
 - [ ] Implement a simple shell for user interactions.
